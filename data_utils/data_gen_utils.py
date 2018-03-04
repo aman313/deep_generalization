@@ -30,7 +30,6 @@ def create_positive_integers_dataset(file_name,size= 10000,max_len=10):
             X_y = X +','+ str(y)
             out_file.write(X_y +'\n')
             
-            
 
 if __name__=='__main__':
     create_positive_integers_dataset('/Users/aman313/Documents/data/synthetic/pos_int_regression_train.csv', 1000, 3)

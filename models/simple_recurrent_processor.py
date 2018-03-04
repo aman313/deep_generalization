@@ -12,18 +12,18 @@ class SequenceToNumberEncoder(nn.Module):
     
     def __init__(self):
         super(SequenceToNumberEncoder, self).__init__()
-        self.lstm = nn.LSTM(10,1)
+        self.lstm = nn.LSTM(10,20)
         self.linear1 = nn.Linear(1,20)
         self.linear2 = nn.Linear(20,1,False)
     
     
     def forward(self, input):
-        lstm_out,lstm_cell = self.lstm(input,(Variable(torch.zeros(input.size(0),1),requires_grad=False),Variable(torch.zeros(input.size(0),1),requires_grad=False) ) )
+        lstm_out,lstm_cell = self.lstm(input,(Variable(torch.randn(input.size(0),20),requires_grad=False),Variable(torch.randn(input.size(0),20),requires_grad=False) ) )
         #linear1_out = self.linear1(lstm_out[:,-1])
-        #linear2_out = self.linear2(linear1_out)
-        return lstm_out[:,-1]
+        linear2_out = self.linear2(lstm_out[:,-1])
+        return torch.nn.ReLU()(linear2_out)
     
-
+    
 class RelativeDifferenceLoss(nn.Module):
     def __init__(self):
         super(RelativeDifferenceLoss,self).__init__()
@@ -33,7 +33,6 @@ class RelativeDifferenceLoss(nn.Module):
         abs_diff = abs_diff_loss(x,y)
         return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
         
-
 def run_epoch(net,train_data_gen,criterion,opt):
     net.train()
     for (X,y) in train_data_gen():
@@ -68,9 +67,8 @@ def test(net,test_data_gen,criterion,verbose=False):
         avg_loss = criterion(output, y)
         if verbose:
             print (X.data.tolist(),y.data.tolist(),output.data.tolist(),avg_loss.data.tolist())
-
+        
         total_loss += (avg_loss)
-
     return total_loss/num_batches
 
 def train(net,train_data_gen,test_data_gen,criterion,opt,num_epochs):
@@ -88,8 +86,7 @@ criterion = RelativeDifferenceLoss()
 
 net = SequenceToNumberEncoder()
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train(net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(test_file,100,2,encoder),criterion,opt,100000)
-
+train(net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(test_file,100,2,encoder),criterion,opt,1000)
 torch.save(net, 'model.pkl')
 
 #net = torch.load('model.pkl')
