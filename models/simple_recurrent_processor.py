@@ -19,9 +19,9 @@ class SequenceToNumberEncoder(nn.Module):
     
     def forward(self, input):
         lstm_out,lstm_cell = self.lstm(input,(Variable(torch.zeros(input.size(0),1),requires_grad=False),Variable(torch.zeros(input.size(0),1),requires_grad=False) ) )
-        linear1_out = self.linear1(lstm_out[:,-1])
-        linear2_out = self.linear2(linear1_out)
-        return linear2_out
+        #linear1_out = self.linear1(lstm_out[:,-1])
+        #linear2_out = self.linear2(linear1_out)
+        return lstm_out[:,-1]
     
 
 class RelativeDifferenceLoss(nn.Module):
@@ -29,9 +29,9 @@ class RelativeDifferenceLoss(nn.Module):
         super(RelativeDifferenceLoss,self).__init__()
     
     def forward(self, x,y):
-        abs_diff_loss = nn.L1Loss()
+        abs_diff_loss = nn.L1Loss(reduce=False)
         abs_diff = abs_diff_loss(x,y)
-        return abs_diff/y if y.data.equal(torch.zeros(1)) else abs_diff
+        return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
         
 
 def run_epoch(net,train_data_gen,criterion,opt):
@@ -48,18 +48,30 @@ def run_epoch(net,train_data_gen,criterion,opt):
 def test(net,test_data_gen,criterion,verbose=False):
     net.eval()
     total_loss = 0
-    num_samples = 0
-    for X,y in test_data_gen():
+    num_batches = 0
+    generator = test_data_gen
+    def present_single(batched_generator):
+        def single_generator():
+            for batch_x,batch_y in batched_generator():
+                for i in range(batch_x.size()[0]):
+                    yield (torch.stack([batch_x[i]]),torch.FloatTensor([batch_y[i]]))
+            
+        return single_generator
+        
+    if verbose:
+        generator = present_single(test_data_gen)
+        
+    for X,y in generator():
         X,y = Variable(X),Variable(y)
-        num_samples += len(y)
+        num_batches += 1
         output = net(X)
-        losses = criterion(output, y)
+        avg_loss = criterion(output, y)
         if verbose:
-            for x,p,g in zip(X.data.tolist(),output.data.tolist(),y.data.tolist()):
-                print (x,p,g)
-        total_loss += (criterion(output, y).sum())
+            print (X.data.tolist(),y.data.tolist(),output.data.tolist(),avg_loss.data.tolist())
 
-    return total_loss/num_samples
+        total_loss += (avg_loss)
+
+    return total_loss/num_batches
 
 def train(net,train_data_gen,test_data_gen,criterion,opt,num_epochs):
     for i in range(num_epochs):
@@ -74,15 +86,14 @@ test_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_test.csv
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 
-'''
 net = SequenceToNumberEncoder()
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train(net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(test_file,100,2,encoder),criterion,opt,100)
+train(net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(test_file,100,2,encoder),criterion,opt,100000)
 
 torch.save(net, 'model.pkl')
-'''
-net = torch.load('model.pkl')
-test(net,batched_data_generator(test_file,100,1,encoder),criterion,True)
+
+#net = torch.load('model.pkl')
+#test(net,batched_data_generator(test_file,100,1,encoder),criterion,True)
 #print(torch.stack([encoder('3',1)]))
 #print(torch.stack([encoder('33',2)]))
 

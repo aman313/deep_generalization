@@ -23,5 +23,5 @@ def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_b
         for i in range(num_batches):
             batch_data = data.sample(n = batch_size)
             max_len = max([len(str(x)) for x in batch_data.X.tolist()])
-            yield (torch.stack([transformer(str(int(x)),max_len) for x in batch_data.X.tolist()]),torch.FloatTensor(batch_data.y.tolist() ))
+            yield (torch.stack([transformer(str(int(x)),max_len) for x in batch_data.X.tolist()]),torch.tanh(torch.FloatTensor(batch_data.y.tolist())) )
     return generate_batches
