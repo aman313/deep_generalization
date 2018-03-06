@@ -26,9 +26,13 @@ class SequenceToNumberEncoder(nn.Module):
         self.linear1 = nn.Linear(20,1)
     
     def forward(self, input):
-        lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False) ) )
-        unpacked_lstm_out = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)[0]
-        linear1_out = torch.nn.ReLU()(self.linear1(unpacked_lstm_out[:,-1]))
+        try:
+            lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False) ) )
+            lstm_out = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)[0]
+        except Exception:
+            lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.size(0),20),requires_grad=False),Variable(torch.randn(2,input.size(0),20),requires_grad=False) ) )
+
+        linear1_out = torch.nn.ReLU()(self.linear1(lstm_out[:,-1]))
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
         return linear1_out
     
@@ -42,8 +46,11 @@ class RelativeDifferenceLoss(nn.Module):
         abs_diff = abs_diff_loss(x,y)
         return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
 
-def stack_and_pack(lst,seq_lens):
-    return pack_padded_sequence(Variable(torch.stack(lst)),seq_lens,True)
+def stack_and_pack(lst,seq_lens,pack=False):
+    if not pack:
+        return Variable(torch.stack(lst))
+    else:
+        return pack_padded_sequence(Variable(torch.stack(lst)),seq_lens,True)
     
         
 def run_epoch(net,train_data_gen,criterion,opt):
@@ -51,7 +58,7 @@ def run_epoch(net,train_data_gen,criterion,opt):
     train_loss = 0
     num_batches = 0
     for (X,y) in train_data_gen():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()]),Variable(y)
+        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False),Variable(y)
         opt.zero_grad()
         output = net(X)
         #print (output,y)
@@ -79,7 +86,7 @@ def test(net,test_data_gen,criterion,verbose=False):
         generator = present_single(test_data_gen)
         
     for X,y in generator():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()]),Variable(y)
+        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False),Variable(y)
         num_batches += 1
         output = net(X)
         avg_loss = criterion(output, y)
