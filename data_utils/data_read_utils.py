@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
-
+import numpy as np
+from torch.nn.utils.rnn import pack_padded_sequence
 def one_hot_transformer(vocab):
     vocab_index = {elem:index for index,elem in enumerate(vocab)}
     def trans(str,max_len):
@@ -16,12 +17,15 @@ def one_hot_transformer(vocab):
     
     return trans
 
-
-def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_batches,transformer):
-    data = pd.read_csv(file_name)
+def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_batches,transformer,data_type=np.int32):
+    data = pd.read_csv(file_name,dtype={'X': data_type, 'y': data_type})
     def generate_batches():
         for i in range(num_batches):
-            batch_data = data.sample(n = batch_size)
-            max_len = max([len(str(x)) for x in batch_data.X.tolist()])
-            yield (torch.stack([transformer(str(int(x)),max_len) for x in batch_data.X.tolist()]),torch.tanh(torch.FloatTensor(batch_data.y.tolist())) )
+            batch_data = data.sample(n = batch_size,replace=True)
+            X = batch_data.X.tolist()
+            y = batch_data.y.tolist()
+            X,y = zip(*sorted(zip(X,y),key=lambda x:len(str(x[0])),reverse=True))
+            seq_lens = [len(str(x)) for x in X]
+            max_len = max(seq_lens)
+            yield ( pack_padded_sequence(torch.stack([transformer(str(x),max_len) for x in X]),seq_lens,True),torch.FloatTensor(y) )
     return generate_batches
