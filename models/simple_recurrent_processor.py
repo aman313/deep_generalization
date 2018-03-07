@@ -55,16 +55,20 @@ class RelativeDifferenceLoss(nn.Module):
 
 def stack_and_pack(lst,seq_lens,pack=False):
     if not pack:
-        return Variable(torch.stack(lst))
+        return Variable(torch.stack(lst)).cuda()
     else:
-        return pack_padded_sequence(Variable(torch.stack(lst)),seq_lens,True)
-    
+        packed_cpu = pack_padded_sequence(Variable(torch.stack(lst)),seq_lens,True)
+        print('packed on cpu')
+        packed_gpu = PackedSequence(packed_cpu.data.cuda(),packed_cpu.batch_sizes)
+        print('packed on gpu',packed_gpu.batch_sizes)
+        return packed_gpu
         
 def run_epoch(net,train_data_gen,criterion,opt):
     net.train()
     train_loss = 0
     num_batches = 0
     for (X,y) in train_data_gen():
+        print('generated batch')
         X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
         opt.zero_grad()
         output = net(X)
@@ -113,6 +117,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
     train_losses_list = []
     val_losses_list = []
     for i in range(num_epochs):
+        print('start epoch ',i)
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         val_loss = test(net, val_data_gen, criterion, False)
         train_losses_list.append(train_loss)
@@ -186,17 +191,18 @@ space = {
     }
 
 encoder = read.one_hot_transformer(vocab_pos_int)
-train_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_train.csv'
-val_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_val.csv'
-test_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_test.csv'
+train_file = '../../data/synthetic/pos_int_regression_ml3_train.csv'
+val_file = '../../data/synthetic/pos_int_regression_ml3_val.csv'
+test_file = '../../data/synthetic/pos_int_regression_m3_test.csv'
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 
 net = SequenceToNumberEncoder()
+net = torch.nn.DataParallel(net)
 #net = torch.load('model.pkl')
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 6000,encoder),batched_data_generator(val_file,1000,100,encoder),criterion,opt,10000,max_epochs_without_improv=100,verbose=True)
-torch.save(net, 'model_ml50.pkl')
+train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 60,encoder),batched_data_generator(val_file,150,1,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
+torch.save(net, 'model_ml3.pkl')
 
 '''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_test.csv'

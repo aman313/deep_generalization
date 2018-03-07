@@ -19,6 +19,7 @@ def one_hot_transformer(vocab):
 
 def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_batches,transformer,data_type=np.int64):
     data = pd.read_csv(file_name,dtype={'X': data_type, 'y': data_type})
+    print('Read file ',file_name)
     def generate_batches():
         for i in range(num_batches):
             batch_data = data.sample(n = batch_size,replace=True)
@@ -27,5 +28,5 @@ def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_b
             X,y = zip(*sorted(zip(X,y),key=lambda x:len(str(x[0])),reverse=True))
             seq_lens = [len(str(x)) for x in X]
             max_len = max(seq_lens)
-            yield ( [transformer(str(x),max_len) for x in X],torch.FloatTensor(y) )
+            yield ( [transformer(str(x),max_len) for x in X],torch.cuda.FloatTensor(y) )
     return generate_batches
