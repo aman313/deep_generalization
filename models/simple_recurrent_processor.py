@@ -12,7 +12,7 @@ from hyperopt.base import Trials, STATUS_OK
 import matplotlib.pyplot as plt
 import time
 import datetime
-from torch.nn.utils.rnn import pack_padded_sequence
+from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
 from torch.nn.utils.rnn import pad_packed_sequence
 
 class SequenceToNumberEncoder(nn.Module):
@@ -25,14 +25,21 @@ class SequenceToNumberEncoder(nn.Module):
         self.lstm = nn.LSTM(10,20,batch_first=True,num_layers=2)
         self.linear1 = nn.Linear(20,1)
     
+    def get_stacked_last_slices(self,unpacked,seq_lens):
+        last_slices = []
+        for i in range(unpacked.size(0)):
+            last_slices.append(unpacked[i,seq_lens[i]-1,:])
+        return torch.stack(last_slices)
+    
     def forward(self, input):
-        try:
+        if isinstance(input,PackedSequence):
             lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False) ) )
-            lstm_out = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)[0]
-        except Exception:
+            lstm_out_unpacked,seq_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)
+            linear_in = self.get_stacked_last_slices(lstm_out_unpacked, seq_lens)
+        else:
             lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.size(0),20),requires_grad=False),Variable(torch.randn(2,input.size(0),20),requires_grad=False) ) )
-
-        linear1_out = torch.nn.ReLU()(self.linear1(lstm_out[:,-1]))
+            linear_in = lstm_out[:,-1,:]
+        linear1_out = torch.nn.ReLU()(self.linear1(linear_in))
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
         return linear1_out
     
@@ -58,7 +65,7 @@ def run_epoch(net,train_data_gen,criterion,opt):
     train_loss = 0
     num_batches = 0
     for (X,y) in train_data_gen():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False),Variable(y)
+        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
         opt.zero_grad()
         output = net(X)
         #print (output,y)
@@ -77,8 +84,8 @@ def test(net,test_data_gen,criterion,verbose=False):
     def present_single(batched_generator):
         def single_generator():
             for batch_x,batch_y in batched_generator():
-                for i in range(batch_x.size()[0]):
-                    yield (torch.stack([batch_x[i]]),torch.FloatTensor([batch_y[i]]))
+                for i in range(len(batch_x)):
+                    yield ([batch_x[i]],torch.FloatTensor([batch_y[i]]))
             
         return single_generator
         
@@ -86,12 +93,16 @@ def test(net,test_data_gen,criterion,verbose=False):
         generator = present_single(test_data_gen)
         
     for X,y in generator():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False),Variable(y)
+        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
         num_batches += 1
         output = net(X)
         avg_loss = criterion(output, y)
         if verbose:
-            print ('x,y,o,l',X.data.tolist(),y.data.tolist(),output.data.tolist(),avg_loss.data.tolist())
+            if isinstance(X, PackedSequence):
+                x_list = X.data.data.tolist()
+            else:
+                x_list = X.data.tolist()
+            print ('x,y,o,l',x_list,y.data.tolist(),output.data.tolist(),avg_loss.data.tolist())
         
         total_loss += (avg_loss)
     return total_loss/num_batches
@@ -122,6 +133,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
         if  best_val_loss is None or val_loss.data.tolist()[0] < best_val_loss.data.tolist()[0]:
             best_val_loss = val_loss
         if val_loss_not_improved >= max_epochs_without_improv:
+            print('Early stopping at epoch',i)
             break
         
     return (train_losses_list,val_losses_list)
@@ -145,7 +157,8 @@ def plot_pred_gold(net,data_generator,file_name=None):
     if not file_name:
         file_name = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S') + '.png'
     X,y = next(data_generator())
-    pred = net(Variable(X))
+    X = stack_and_pack(X, [len(str(int(x))) for x in y.tolist()], True)
+    pred = net(X)
     plt.scatter(y.tolist(),pred.data.tolist())
     plt.savefig(file_name)
     plt.close()
@@ -173,22 +186,21 @@ space = {
     }
 
 encoder = read.one_hot_transformer(vocab_pos_int)
-train_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_train.csv'
-val_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_val.csv'
-test_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_test.csv'
+train_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_train.csv'
+val_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_val.csv'
+test_file = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_test.csv'
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 
 net = SequenceToNumberEncoder()
 #net = torch.load('model.pkl')
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,150,1,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
-torch.save(net, 'model_ml2.pkl')
+train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 6000,encoder),batched_data_generator(val_file,1000,100,encoder),criterion,opt,10000,max_epochs_without_improv=100,verbose=True)
+torch.save(net, 'model_ml50.pkl')
 
 '''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_test.csv'
 test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_train.csv'
-
 net = torch.load('model_ml2.pkl')
 print('Original size test loss')
 print(test(net,batched_data_generator(test_file_ml2,200,1,encoder),criterion,True))

@@ -47,4 +47,4 @@ def create_positive_integers_dataset(file_name,size= 10000,max_len=10,train_rati
             
 
 if __name__=='__main__':
-    create_positive_integers_dataset('/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_', 10000, 5)
+    create_positive_integers_dataset('/Users/aman313/Documents/data/synthetic/pos_int_regression_ml15_', 1000000, 15)

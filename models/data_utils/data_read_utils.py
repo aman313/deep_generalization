@@ -17,7 +17,7 @@ def one_hot_transformer(vocab):
     
     return trans
 
-def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_batches,transformer,data_type=np.int32):
+def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_batches,transformer,data_type=np.int64):
     data = pd.read_csv(file_name,dtype={'X': data_type, 'y': data_type})
     def generate_batches():
         for i in range(num_batches):
