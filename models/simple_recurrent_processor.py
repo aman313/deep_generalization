@@ -15,6 +15,8 @@ import datetime
 from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
 from torch.nn.utils.rnn import pad_packed_sequence
 
+GPU = read.GPU
+
 class SequenceToNumberEncoder(nn.Module):
     '''
         Takes in a one hot encoded sequence and predicts the number it represents 
@@ -35,7 +37,11 @@ class SequenceToNumberEncoder(nn.Module):
         if isinstance(input,tuple):
             input = PackedSequence(input[0],input[1])
         if isinstance(input,PackedSequence):
-            lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
+            if GPU:
+                lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
+            else:
+                lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False) ) )
+
             lstm_out_unpacked,seq_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)
             linear_in = self.get_stacked_last_slices(lstm_out_unpacked, seq_lens)
         else:
@@ -58,14 +64,19 @@ class RelativeDifferenceLoss(nn.Module):
 
 def stack_and_pack(lst,seq_lens,pack=False):
     if not pack:
-        return Variable(torch.stack(lst)).cuda()
+        if GPU:
+            return Variable(torch.stack(lst)).cuda()
+        else:
+            return Variable(torch.stack(lst))
     else:
         packed_cpu = pack_padded_sequence(Variable(torch.stack(lst)),seq_lens,True)
         #print('packed on cpu')
-        packed_gpu = PackedSequence(packed_cpu.data.cuda(),packed_cpu.batch_sizes)
+        if GPU:
+            packed_gpu = PackedSequence(packed_cpu.data.cuda(),packed_cpu.batch_sizes)
+            return packed_gpu
         #print('packed on gpu',packed_gpu.batch_sizes)
         #print(type(packed_gpu))
-        return packed_gpu
+        return packed_cpu
         
 def run_epoch(net,train_data_gen,criterion,opt):
     net.train()
@@ -73,7 +84,11 @@ def run_epoch(net,train_data_gen,criterion,opt):
     num_batches = 0
     for (X,y) in train_data_gen():
         #print('generated batch')
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y.cuda())
+        if GPU:
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y.cuda())
+        else:
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
+
         opt.zero_grad()
         #print(type(X))
         output = net((X))
@@ -102,7 +117,10 @@ def test(net,test_data_gen,criterion,verbose=False):
         generator = present_single(test_data_gen)
         
     for X,y in generator():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y.cuda())
+        if GPU:
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y.cuda())
+        else:
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
         num_batches += 1
         output = net(X)
         avg_loss = criterion(output, y)
@@ -126,9 +144,14 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
         #print('start epoch ',i)
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         val_loss = test(net, val_data_gen, criterion, False)
-        train_losses_list.append(train_loss.data.cpu())
-        val_losses_list.append(val_loss.data.cpu())
-        del train_loss,val_loss
+        if GPU:
+            train_losses_list.append(train_loss.data.cpu())
+            val_losses_list.append(val_loss.data.cpu())
+            del train_loss,val_loss
+
+        else:
+            train_losses_list.append(train_loss.data)
+            val_losses_list.append(val_loss.data)
         if i > 0:
             if best_val_loss[0] ==0.0:
                 break
@@ -199,18 +222,18 @@ space = {
     }
 
 encoder = read.one_hot_transformer(vocab_pos_int)
-train_file = '../../data/synthetic/pos_int_regression_ml8_train.csv'
-val_file = '../../data/synthetic/pos_int_regression_ml8_val.csv'
-test_file = '../../data/synthetic/pos_int_regression_m8_test.csv'
+train_file = '../../data/synthetic/pos_int_regression_ml4_even_train.csv'
+val_file = '../../data/synthetic/pos_int_regression_ml4_even_val.csv'
+test_file = '../../data/synthetic/pos_int_regression_ml4_even_test.csv'
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 
 net = SequenceToNumberEncoder()
-net = torch.nn.DataParallel(net)
+#net = torch.nn.DataParallel(net)
 #net = torch.load('model.pkl')
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 6000,encoder),batched_data_generator(val_file,200,20,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
-torch.save(net, 'model_ml8.pkl')
+train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
+torch.save(net, 'model_ml4_even.pkl')
 
 '''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_test.csv'
