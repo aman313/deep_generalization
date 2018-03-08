@@ -61,7 +61,7 @@ def strictly_ascending(string,reverse = False):
     return False
 def generate_sequence_to_current_digit_and_multiplier_dataset(size= 10000,max_len=10):
     for X in generate_random_positive_integers_of_length(size, max_len):
-        print(X)
+#         print(X)
         Y=[]
         for i in range(0,len(X)):
             #Y.append([int(X[i:i+1]),10**i])
@@ -99,6 +99,6 @@ def create_dataset(file_name,generater,train_ratio=0.8,val_ratio=0.2):
             else:
                 csv_test.writerow([X,y])
 if __name__=='__main__':
-#     create_positive_integers_dataset('/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_', 1000000, 15)
-    create_sequence_to_current_digit_and_multiplier_dataset('/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_', 10000, 5)
+    create_positive_integers_dataset('/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_', 10000, 5)
+#     create_sequence_to_current_digit_and_multiplier_dataset('/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_', 10000, 5)
     
