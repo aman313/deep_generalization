@@ -14,6 +14,8 @@ import time
 import datetime
 from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
 from torch.nn.utils.rnn import pad_packed_sequence
+import multiprocessing
+import sys
 
 GPU = read.GPU
 
@@ -170,6 +172,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
                 print ('Train loss',train_losses_list[i][0])
                 print ('Val loss', val_losses_list[i][0])
                 print('No improvement epochs ',val_loss_not_improved)
+                sys.stdout.flush()
         if  best_val_loss is None or val_losses_list[i][0] < best_val_loss[0]:
             best_val_loss = val_losses_list[i]
         if val_loss_not_improved >= max_epochs_without_improv:
@@ -233,15 +236,29 @@ test_file = '../../data/synthetic/pos_int_regression_ml4_odd_test.csv'
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 #criterion = nn.L1Loss()
-'''
-net = SequenceToNumberEncoder()
-if GPU:
-	net = torch.nn.DataParallel(net)
-#net = torch.load('model.pkl')
-opt = optim.Adam(net.parameters(), lr=1e-3)
-#opt = optim.SGD()
-train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True)
-torch.save(net, 'model_ml4_odd.pkl')
+
+def do_run(run_index,out_prefix):
+    sys.stdout = open(str(out_prefix)+str(run_index) + ".log", "w")
+
+    net = SequenceToNumberEncoder()
+    if GPU:
+    	net = torch.nn.DataParallel(net)
+    #net = torch.load('model.pkl')
+    opt = optim.Adam(net.parameters(), lr=1e-3)
+    #opt = optim.SGD()
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True)
+    torch.save(net, out_prefix+str(run_index)+'.pkl')
+
+
+def do_parallel_runs(num_par,out_prefix):
+    jobs = []
+    for i in range(num_par):
+        p = multiprocessing.Process(target=do_run,args=(i,out_prefix))
+        jobs.append(p)
+        p.start()
+
+
+do_parallel_runs(2,'model_ml4_odd_')
 
 '''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_odd_test.csv'
@@ -253,7 +270,7 @@ print('New size test loss')
 print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,False))
 plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4_odd_test_ml4_odd.png')
 plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_odd_test_ml4_even.png')
-
+'''
 
 #print(torch.stack([encoder('3',1)]))
 #print(torch.stack([encoder('33',2)]))
