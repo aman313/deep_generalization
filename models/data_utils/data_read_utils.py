@@ -28,5 +28,5 @@ def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_b
             X,y = zip(*sorted(zip(X,y),key=lambda x:len(str(x[0])),reverse=True))
             seq_lens = [len(str(x)) for x in X]
             max_len = max(seq_lens)
-            yield ( [transformer(str(x),max_len) for x in X],torch.cuda.FloatTensor(y) )
+            yield ( [transformer(str(x),max_len) for x in X],torch.FloatTensor(y) )
     return generate_batches
