@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import ast
 
-GPU=True
+GPU=False
 
 def one_hot_transformer(vocab):
     vocab_index = {elem:index for index,elem in enumerate(vocab)}
@@ -28,7 +28,7 @@ def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_b
             batch_data = data.sample(n = batch_size,replace=True)
             X = batch_data.X.tolist()
             y = batch_data.y.tolist()
-            print(X[0])
+            #print(X[0])
             X,y = zip(*sorted(zip(X,y),key=lambda x:len(str(x[0])),reverse=True))
             seq_lens = [len(str(x)) for x in X]
             max_len = max(seq_lens)

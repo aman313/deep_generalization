@@ -27,7 +27,7 @@ class SequenceToNumberEncoder(nn.Module):
         self.num_layers = 4
         self.lstm = nn.LSTM(10,20,batch_first=True,num_layers=self.num_layers)
         self.linear1 = nn.Linear(20,1)
-    
+            
     def get_stacked_last_slices(self,unpacked,seq_lens):
         last_slices = []
         for i in range(unpacked.size(0)):
@@ -141,6 +141,8 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
     best_val_loss = None
     train_losses_list = []
     val_losses_list = []
+    scheduler =torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, 
+                                                         patience=50, verbose=True, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
     for i in range(num_epochs):
         #print('start epoch ',i)
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
@@ -153,6 +155,8 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
         else:
             train_losses_list.append(train_loss.data)
             val_losses_list.append(val_loss.data)
+        scheduler.step(val_losses_list[i][0])
+        #optimizer.step()
         if i > 0:
             if best_val_loss[0] ==0.0:
                 break
@@ -223,31 +227,33 @@ space = {
     }
 
 encoder = read.one_hot_transformer(vocab_pos_int)
-train_file = '../../data/synthetic/pos_int_regression_ml4_even_train.csv'
-val_file = '../../data/synthetic/pos_int_regression_ml4_even_val.csv'
-test_file = '../../data/synthetic/pos_int_regression_ml4_even_test.csv'
+train_file = '../../data/synthetic/pos_int_regression_ml4_odd_train.csv'
+val_file = '../../data/synthetic/pos_int_regression_ml4_odd_val.csv'
+test_file = '../../data/synthetic/pos_int_regression_ml4_odd_test.csv'
 batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
-
+#criterion = nn.L1Loss()
+'''
 net = SequenceToNumberEncoder()
 if GPU:
 	net = torch.nn.DataParallel(net)
 #net = torch.load('model.pkl')
 opt = optim.Adam(net.parameters(), lr=1e-3)
-train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
-torch.save(net, 'model_ml4_even.pkl')
+#opt = optim.SGD()
+train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True)
+torch.save(net, 'model_ml4_odd.pkl')
 
 '''
-test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml2_test.csv'
-test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_train.csv'
-net = torch.load('model_ml2.pkl')
+test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_odd_test.csv'
+test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_even_test.csv'
+net = torch.load('model_ml4_odd.pkl')
 print('Original size test loss')
-print(test(net,batched_data_generator(test_file_ml2,200,1,encoder),criterion,True))
+print(test(net,batched_data_generator(test_file_ml2,800,1,encoder),criterion,False))
 print('New size test loss')
-print(test(net,batched_data_generator(test_file_ml4,200,1,encoder),criterion,True))
-plot_pred_gold(net, batched_data_generator(test_file_ml2,200,1,encoder), 'train_ml2_test_ml2.png')
-plot_pred_gold(net, batched_data_generator(test_file_ml4,200,1,encoder), 'train_ml2_test_ml4.png')
-'''
+print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,False))
+plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4_odd_test_ml4_odd.png')
+plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_odd_test_ml4_even.png')
+
 
 #print(torch.stack([encoder('3',1)]))
 #print(torch.stack([encoder('33',2)]))
