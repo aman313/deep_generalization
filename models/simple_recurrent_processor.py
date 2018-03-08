@@ -39,9 +39,9 @@ class SequenceToNumberEncoder(nn.Module):
             input = PackedSequence(input[0],input[1])
         if isinstance(input,PackedSequence):
             if GPU:
-                lstm_out,_ = self.lstm(input,(Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
+                lstm_out,_ = self.lstm(input,(Variable(torch.zeros(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.zeros(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
             else:
-                lstm_out,_ = self.lstm(input,(Variable(torch.randn(self.num_layers,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(self.num_layers,input.batch_sizes[0],20),requires_grad=False) ) )
+                lstm_out,_ = self.lstm(input,(Variable(torch.zeros(self.num_layers,input.batch_sizes[0],20),requires_grad=False),Variable(torch.zeros(self.num_layers,input.batch_sizes[0],20),requires_grad=False) ) )
 
             lstm_out_unpacked,seq_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)
             linear_in = self.get_stacked_last_slices(lstm_out_unpacked, seq_lens)
