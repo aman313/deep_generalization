@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import ast
 
-GPU=False
+GPU=True
 
 def one_hot_transformer(vocab):
     vocab_index = {elem:index for index,elem in enumerate(vocab)}

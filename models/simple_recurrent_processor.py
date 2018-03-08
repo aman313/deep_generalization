@@ -24,7 +24,8 @@ class SequenceToNumberEncoder(nn.Module):
     
     def __init__(self):
         super(SequenceToNumberEncoder, self).__init__()
-        self.lstm = nn.LSTM(10,20,batch_first=True,num_layers=2)
+        self.num_layers = 4
+        self.lstm = nn.LSTM(10,20,batch_first=True,num_layers=self.num_layers)
         self.linear1 = nn.Linear(20,1)
     
     def get_stacked_last_slices(self,unpacked,seq_lens):
@@ -38,9 +39,9 @@ class SequenceToNumberEncoder(nn.Module):
             input = PackedSequence(input[0],input[1])
         if isinstance(input,PackedSequence):
             if GPU:
-                lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
+                lstm_out,_ = self.lstm(input,(Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
             else:
-                lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(2,input.batch_sizes[0],20),requires_grad=False) ) )
+                lstm_out,_ = self.lstm(input,(Variable(torch.randn(self.num_layers,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(self.num_layers,input.batch_sizes[0],20),requires_grad=False) ) )
 
             lstm_out_unpacked,seq_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm_out,batch_first=True)
             linear_in = self.get_stacked_last_slices(lstm_out_unpacked, seq_lens)
@@ -229,7 +230,8 @@ batched_data_generator = read.batched_data_generator_from_file_with_replacement
 criterion = RelativeDifferenceLoss()
 
 net = SequenceToNumberEncoder()
-#net = torch.nn.DataParallel(net)
+if GPU:
+	net = torch.nn.DataParallel(net)
 #net = torch.load('model.pkl')
 opt = optim.Adam(net.parameters(), lr=1e-3)
 train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,1000,max_epochs_without_improv=50,verbose=True)
