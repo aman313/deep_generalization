@@ -138,7 +138,7 @@ def test(net,test_data_gen,criterion,verbose=False):
     return total_loss/num_batches
 
 import gc
-def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False,model_out):
+def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False,model_out=''):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
@@ -247,7 +247,7 @@ def do_run(run_index,out_prefix):
     #net = torch.load('model.pkl')
     opt = optim.Adam(net.parameters(), lr=1e-3)
     #opt = optim.SGD()
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True,out_prefix+str(run_index)+'.pkl')
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True,model_out=out_prefix+str(run_index)+'.pkl')
     torch.save(net, out_prefix+str(run_index)+'.pkl')
 
 
@@ -260,9 +260,9 @@ def do_parallel_runs(num_par,out_prefix):
 
 
 #do_parallel_runs(1,'model_ml4_odd_')
-do_run('','pos_int_regression_ml4_first_odd_')
+#do_run('','pos_int_regression_ml4_first_odd_')
 
-'''
+
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_even_test.csv'
 test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
 net = torch.load('pos_int_regression_ml4_first_even_.pkl')
@@ -272,7 +272,7 @@ print('New size test loss')
 print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,False))
 plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4__first_even_test_ml4_first_even.png')
 plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_first_even_test_ml4_first_odd.png')
-'''
+
 
 #print(torch.stack([encoder('3',1)]))
 #print(torch.stack([encoder('33',2)]))
