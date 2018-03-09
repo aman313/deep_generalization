@@ -256,16 +256,16 @@ if __name__ == '__main__':
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
 # #
-#     date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     model_name='model_compositional_no_pretrain'+date+'.pkl'
-#     print("Training:-",model_name)      
-#     net = SequenceToNumberEncoderCompositional()
-#     opt = optim.Adam(net.parameters(), lr=1e-2)
-#     train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
-#     torch.save(net, 'model_compositional_no_pretrain_2_lstm2.pkl')
+    date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    model_name='model_compositional_no_pretrain'+date+'.pkl'
+    print("Training:-",model_name)      
+    net = SequenceToNumberEncoderCompositional()
+    opt = optim.Adam(net.parameters(), lr=1e-2)
+    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
+    
 # #      
 #     
-    model_name='model_compositional_no_pretrain-o.pkl'  
+#     model_name='model_compositional_no_pretrain-o.pkl'  
     net = torch.load(model_name)
     print('Original size test loss')
 #     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
