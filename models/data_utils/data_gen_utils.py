@@ -103,5 +103,4 @@ def create_dataset(file_name,generator_function,filter_function=lambda _:True,tr
 if __name__=='__main__':
     # create_positive_integers_dataset('/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_', 1000000, 15)
 #     create_sequence_to_current_digit_and_multiplier_dataset('../../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_', 10000, 5)
-    
-    create_dataset(file_name='../../../data/synthetic/pos_int_regression_ml4_first_even_',generator_function=lambda :((str(x),x) for x in range(10000)),filter_function=lambda x:int(x[0])%2==0 )
+        create_dataset(file_name='../../../data/synthetic/pos_int_regression_ml4_first_even_',generator_function=lambda :((str(x),x) for x in range(10000)),filter_function=lambda x:int(x[0])%2==0 )

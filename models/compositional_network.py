@@ -16,6 +16,8 @@ from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
 from torch.nn.utils.rnn import pad_packed_sequence
 from indice_and_multiplier_subnetwork import *
 import sys
+use_preTrained=False
+use_LSTM=False
 class SequenceToNumberEncoderCompositional(nn.Module):
     '''
         Takes in a one hot encoded sequence and predicts the number it represents 
@@ -24,11 +26,28 @@ class SequenceToNumberEncoderCompositional(nn.Module):
     def __init__(self):
         super(SequenceToNumberEncoderCompositional, self).__init__()
 #         self.digitScalarNet=SequenceToScalarAndMultiplierPredictor()
-        self.digitScalarNet = torch.load('model_upper_50.pkl')
-        self.lstm1 = nn.LSTM(10,19,batch_first=True,num_layers=1)
-        self.lstm2 = nn.LSTM(20,20,batch_first=True,num_layers=1)
+        if(use_preTrained):
+            self.preTrainedNets=nn.ModuleList()
+            self.digitScalarNet = torch.load('model_upper_50.pkl')
+            for param in self.digitScalarNet.parameters():
+                param.requires_grad = False
+            self.preTrainedNets.append(self.digitScalarNet)
+        if(use_preTrained):
+            if(use_LSTM):
+                self.rnn1 = nn.LSTM(10,19,batch_first=True,num_layers=1)
+            else:
+                self.rnn1 = nn.GRU(10,19,batch_first=True,num_layers=1)
+        else:
+            if(use_LSTM):
+                self.rnn1 = nn.LSTM(10,20,batch_first=True,num_layers=1)
+            else:
+                self.rnn1 = nn.GRU(10,20,batch_first=True,num_layers=1)
+        if(use_LSTM): 
+            self.rnn2 = nn.LSTM(20,20,batch_first=True,num_layers=1)
+        else:
+            self.rnn2 = nn.GRU(20,20,batch_first=True,num_layers=1)
         self.linear1 = nn.Linear(20,1)
-        self.preTrainedNets=nn.ModuleList([self.digitScalarNet])
+
         
     
     def get_stacked_last_slices(self,unpacked,seq_lens):
@@ -39,29 +58,41 @@ class SequenceToNumberEncoderCompositional(nn.Module):
     
     def forward(self, input):
         if isinstance(input,PackedSequence):
-            lstm1_out,_ = self.lstm1(input,(Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False) ) )
-            lstm1_out_unpacked,seq1_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm1_out,batch_first=True)
-            digit_scalar_out=self.digitScalarNet(input)
-#             print(lstm1_out_unpacked)
-#             print(digit_scalar_out)
-            lstm2_in_unpacked=torch.cat([lstm1_out_unpacked,digit_scalar_out],2)
-#             print(lstm2_in_unpacked)
-#             print(len(seq1_lens),input.batch_sizes[0])
-#             raise("break")
-            lst2m_in=torch.nn.utils.rnn.pack_padded_sequence(lstm2_in_unpacked,seq1_lens,batch_first=True)
-            
-            lstm2_out,_=self.lstm2(lst2m_in,(Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False) ) )
-            lstm2_out_unpacked,seq2_lens = torch.nn.utils.rnn.pad_packed_sequence(lstm2_out,batch_first=True)
-#             linear_in=lstm2_in_unpacked.view(input.batch_sizes[0],-1)
-#             print(lstm2_out_unpacked)
-            linear_in = self.get_stacked_last_slices(lstm2_out_unpacked, seq2_lens)
+            if(use_preTrained):
+                if(use_LSTM): 
+                    rnn1_out,_ = self.rnn1(input,(Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False) ) )
+                else:
+                    rnn1_out,_ = self.rnn1(input,Variable(torch.zeros(1,input.batch_sizes[0],19),requires_grad=False))
+                rnn1_out_unpacked,seq1_lens = torch.nn.utils.rnn.pad_packed_sequence(rnn1_out,batch_first=True)
+                digit_scalar_out=self.digitScalarNet(input)
+    #             print(rnn1_out_unpacked)
+    #             print(digit_scalar_out)
+                rnn2_in_unpacked=torch.cat([rnn1_out_unpacked,digit_scalar_out],2)
+    #             print(rnn2_in_unpacked)
+    #             print(len(seq1_lens),input.batch_sizes[0])
+    #             raise("break")
+                rnn2_in=torch.nn.utils.rnn.pack_padded_sequence(rnn2_in_unpacked,seq1_lens,batch_first=True)
+            else:
+                if(use_LSTM):
+                    rnn1_out,_ = self.rnn1(input,(Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False) ) )
+                else:
+                    rnn1_out,_ = self.rnn1(input,Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False))
+                rnn2_in=rnn1_out
+            if(use_LSTM):
+                rnn2_out,_=self.rnn2(rnn2_in,(Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False) ) )
+            else:
+                rnn2_out,_=self.rnn2(rnn2_in,Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False))
+            rnn2_out_unpacked,seq2_lens = torch.nn.utils.rnn.pad_packed_sequence(rnn2_out,batch_first=True)
+#             linear_in=rnn2_in_unpacked.view(input.batch_sizes[0],-1)
+#             print(rnn2_out_unpacked)
+            linear_in = self.get_stacked_last_slices(rnn2_out_unpacked, seq2_lens)
 #             print(linear_in)
             
         else:
             raise("Unimplemented for non packed sequences")
         linear1_out = torch.nn.ReLU()(self.linear1(linear_in))
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
-        print(linear1_out[0])
+#         print(linear1_out[0])
         return linear1_out
     
 
@@ -87,7 +118,7 @@ def run_epoch(net,train_data_gen,criterion,opt):
         #print (output,y)
         loss = criterion(output,y)
         loss.backward()
-        [subModule.zero_grad() for subModule in net.preTrainedNets]
+#         [subModule.zero_grad() for subModule in net.preTrainedNets]
         train_loss += loss
         num_batches+=1
         
@@ -216,16 +247,16 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_train.csv'
-    val_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_val.csv'
-    test_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_test.csv'
+    train_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_train.csv'
+    val_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_val.csv'
+    test_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_test.csv'
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
 # #      
     net = SequenceToNumberEncoderCompositional()
     opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 1, 6000,encoder),batched_data_generator(val_file,1,100,encoder),criterion,opt,10000,max_epochs_without_improv=2,verbose=True)
-    torch.save(net, 'model_upper_debug.pkl')
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 60,encoder),batched_data_generator(val_file,100,100,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    torch.save(net, 'model_compositional_no_pretrain_4.pkl')
 # #      
 #     
 #     
