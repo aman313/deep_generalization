@@ -188,23 +188,23 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_train.csv'
-    val_file = '/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_val.csv'
-    test_file = '/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_test.csv'
+    train_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_train.csv'
+    val_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_val.csv'
+    test_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_test.csv'
     batched_data_generator = read.batched_data_generator_from_file_with_replacement_for_string_to_seq_of_tuples
     criterion = torch.nn.MSELoss()
 # #      
-#     net = SequenceToScalarAndMultiplierPredictor()
-#     opt = optim.Adam(net.parameters(), lr=1e-3)
-#     train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 6000,encoder),batched_data_generator(val_file,1000,100,encoder),criterion,opt,10000,max_epochs_without_improv=2,verbose=True)
-#     torch.save(net, 'model_upper_719.pkl')
+    net = SequenceToScalarAndMultiplierPredictor()
+    opt = optim.Adam(net.parameters(), lr=1e-3)
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 60,encoder),batched_data_generator(val_file,100,20,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    torch.save(net, 'model_upper_9_235.pkl')
 # # #      
 #     
 #     
-    net = torch.load('model_upper_50.pkl')
-    print('Original size test loss')
-    print(test(net,batched_data_generator(test_file,200,1,encoder),criterion,True))
-#     print('New size test loss')
+#     net = torch.load('model_upper_50.pkl')
+#     print('Original size test loss')
+#     print(test(net,batched_data_generator(test_file,200,1,encoder),criterion,True))
+# #     print('New size test loss')
 #     print(test(net,batched_data_generator(test_file_ml4,200,1,encoder),criterion,True))
 #     plot_pred_gold(net, batched_data_generator(test_file_ml2,200,1,encoder), 'train_ml2_test_ml2.png')
 #     plot_pred_gold(net, batched_data_generator(test_file_ml4,200,1,encoder), 'train_ml2_test_ml4.png')
