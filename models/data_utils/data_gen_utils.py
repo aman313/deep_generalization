@@ -74,13 +74,13 @@ def generateCurrentDigit(decimal):
 
 
 
-def create_positive_integers_dataset(file_name,size= 10000,max_len=10,train_ratio=0.8,val_ratio=0.2):
+def create_positive_integers_dataset(file_name,size= 10000,max_len=10,train_ratio=0.6,val_ratio=0.2):
     create_dataset(file_name,generate_positive_integers_dataset(size, max_len),train_ratio,val_ratio)
 def create_sequence_to_current_digit_and_multiplier_dataset(file_name,size= 10000,max_len=10,train_ratio=0.8,val_ratio=0.2):
     create_dataset(file_name,generate_sequence_to_current_digit_and_multiplier_dataset(size, max_len),train_ratio,val_ratio)
             
 
-def create_dataset(file_name,generater,train_ratio=0.8,val_ratio=0.2):
+def create_dataset(file_name,generator_function,filter_function,train_ratio=0.8,val_ratio=0.2):
     with open(file_name+'train.csv','w') as out_file_train,open(file_name+'test.csv','w') as out_file_test,open(file_name+'val.csv','w') as out_file_val:
         csv_train= csv.writer(out_file_train)
         csv_test= csv.writer(out_file_test)
@@ -89,7 +89,7 @@ def create_dataset(file_name,generater,train_ratio=0.8,val_ratio=0.2):
         csv_test.writerow(['X','y'])
         csv_val.writerow(['X','y'])
         
-        for X,y in generater:
+        for X,y in filter(lambda x:filter_function(x[0]),generator_function()):
             #X_y = X +','+ str(y)
             rnd = random.random()
             if rnd < val_ratio:
@@ -100,6 +100,6 @@ def create_dataset(file_name,generater,train_ratio=0.8,val_ratio=0.2):
                 csv_test.writerow([X,y])
 if __name__=='__main__':
     # create_positive_integers_dataset('/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_', 1000000, 15)
-    create_sequence_to_current_digit_and_multiplier_dataset('/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_', 10000, 5)
+    #create_sequence_to_current_digit_and_multiplier_dataset('/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_', 10000, 5)
     
-    #create_positive_integers_dataset(file_name='../../../data/synthetic/pos_int_regression_ml4_odd_', max_len=5,generator_funtion=lambda :((str(x),x) for x in range(10000)),filter_function=lambda x:int(x)%2!=0 )
+    create_dataset(file_name='../../../data/synthetic/pos_int_regression_ml4_first_even_',generator_function=lambda :((str(x),x) for x in range(10000)),filter_function=lambda x:int(x[0])%2==0 )
