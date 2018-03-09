@@ -60,7 +60,7 @@ class SequenceToNumberEncoderCompositional(nn.Module):
         if isinstance(input,PackedSequence):
             if(use_preTrained):
                 if(use_LSTM): 
-                    rnn1_out,_ = self.rnn1(input,(Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],19),requires_grad=False) ) )
+                    rnn1_out,_ = self.rnn1(input,(Variable(torch.zeros(1,input.batch_sizes[0],19),requires_grad=False),Variable(torch.zeros(1,input.batch_sizes[0],19),requires_grad=False) ) )
                 else:
                     rnn1_out,_ = self.rnn1(input,Variable(torch.zeros(1,input.batch_sizes[0],19),requires_grad=False))
                 rnn1_out_unpacked,seq1_lens = torch.nn.utils.rnn.pad_packed_sequence(rnn1_out,batch_first=True)
@@ -74,12 +74,12 @@ class SequenceToNumberEncoderCompositional(nn.Module):
                 rnn2_in=torch.nn.utils.rnn.pack_padded_sequence(rnn2_in_unpacked,seq1_lens,batch_first=True)
             else:
                 if(use_LSTM):
-                    rnn1_out,_ = self.rnn1(input,(Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False) ) )
+                    rnn1_out,_ = self.rnn1(input,(Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False) ) )
                 else:
                     rnn1_out,_ = self.rnn1(input,Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False))
                 rnn2_in=rnn1_out
             if(use_LSTM):
-                rnn2_out,_=self.rnn2(rnn2_in,(Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.randn(1,input.batch_sizes[0],20),requires_grad=False) ) )
+                rnn2_out,_=self.rnn2(rnn2_in,(Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False),Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False) ) )
             else:
                 rnn2_out,_=self.rnn2(rnn2_in,Variable(torch.zeros(1,input.batch_sizes[0],20),requires_grad=False))
             rnn2_out_unpacked,seq2_lens = torch.nn.utils.rnn.pad_packed_sequence(rnn2_out,batch_first=True)
@@ -168,7 +168,7 @@ class RelativeDifferenceLoss(nn.Module):
         abs_diff = abs_diff_loss(x,y)
         return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
 
-def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
+def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
@@ -184,6 +184,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
                 break
             if ((best_val_loss.data.tolist()[0]-val_loss.data.tolist()[0])/best_val_loss.data.tolist()[0]) > tolerance:
                 val_loss_not_improved = 0
+                torch.save(net, model_out)
             else:
                 val_loss_not_improved +=1
         if verbose:
@@ -254,21 +255,24 @@ if __name__ == '__main__':
 
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
-# #      
-    net = SequenceToNumberEncoderCompositional()
-    opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 1, 60,encoder),batched_data_generator(val_file,100,100,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
-    torch.save(net, 'model_compositional_no_pretrain_4.pkl')
+# #
+#     date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     model_name='model_compositional_no_pretrain'+date+'.pkl'
+#     print("Training:-",model_name)      
+#     net = SequenceToNumberEncoderCompositional()
+#     opt = optim.Adam(net.parameters(), lr=1e-2)
+#     train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+#     torch.save(net, 'model_compositional_no_pretrain_2_lstm2.pkl')
 # #      
 #     
-#     
-    net = torch.load('model_compositional_no_pretrain_2_lstm.pkl')
+    model_name='model_compositional_no_pretrain-o.pkl'  
+    net = torch.load(model_name)
     print('Original size test loss')
 #     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
 # #     print('New size test loss')
 #     print(test(net,batched_data_generator(val_file,200,2,encoder),criterion,True))
-    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), 'train_ml2_test_ml2.png')
-    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), 'train_ml2_test_ml4.png')
+    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), model_name+'_val.png')
+    plot_pred_gold(net, batched_data_generator(test_file,200,2,encoder), model_name+'_test.png')
 #     '''
     
     #print(torch.stack([encoder('3',1)]))

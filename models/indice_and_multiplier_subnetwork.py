@@ -108,7 +108,7 @@ def test(net,test_data_gen,criterion,verbose=False):
         total_loss += (avg_loss)
     return total_loss/num_batches
 
-def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
+def train_with_early_stopping(model_name,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
@@ -124,6 +124,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
                 break
             if ((best_val_loss.data.tolist()[0]-val_loss.data.tolist()[0])/best_val_loss.data.tolist()[0]) > tolerance:
                 val_loss_not_improved = 0
+                torch.save(net, model_name)
             else:
                 val_loss_not_improved +=1
         if verbose:
@@ -193,21 +194,23 @@ if __name__ == '__main__':
     test_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_test.csv'
     batched_data_generator = read.batched_data_generator_from_file_with_replacement_for_string_to_seq_of_tuples
     criterion = torch.nn.MSELoss()
-# #      
+# #
+    date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    model_name='model_indice_'+date+'.pkl'      
     net = SequenceToScalarAndMultiplierPredictor()
     opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 2, 60,encoder),batched_data_generator(val_file,2,20,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
-    torch.save(net, 'model_upper_9_536.pkl')
+    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 2, 6000,encoder),batched_data_generator(val_file,2,2000,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    
 # # #      
 #     
 #     
-    net = torch.load('model_upper_9_536.pkl')
+    net = torch.load(model_name)
     print('Original size test loss')
     print(test(net,batched_data_generator(train_file,200,1,encoder),criterion,True))
 #     print('New size test loss')
 #     print(test(net,batched_data_generator(test_file_ml4,200,1,encoder),criterion,True))
-    plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), 'train_iml2_test_ml2.png')
-    plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), 'train_iml2_test_ml4.png')
+    plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), model_name+'_val.png')
+#     plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), 'train_iml2_test_ml4.png')
 #     '''
     
     #print(torch.stack([encoder('3',1)]))
