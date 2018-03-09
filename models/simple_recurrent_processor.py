@@ -144,7 +144,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
     train_losses_list = []
     val_losses_list = []
     scheduler =torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, 
-                                                         patience=50, verbose=True, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
+                                                         patience=90, verbose=True, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
     for i in range(num_epochs):
         #print('start epoch ',i)
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
@@ -260,19 +260,19 @@ def do_parallel_runs(num_par,out_prefix):
 
 
 #do_parallel_runs(1,'model_ml4_odd_')
-#do_run('','pos_int_regression_ml4_first_odd_')
+do_run('','pos_int_regression_ml4_first_odd_1_')
+'''
 
-
-test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_even_test.csv'
-test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
-net = torch.load('pos_int_regression_ml4_first_even_.pkl')
+test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
+test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_even_test.csv'
+net = torch.load('pos_int_regression_ml4_first_odd_.pkl')
 print('Original size test loss')
 print(test(net,batched_data_generator(test_file_ml2,800,1,encoder),criterion,False))
 print('New size test loss')
 print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,False))
-plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4__first_even_test_ml4_first_even.png')
-plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_first_even_test_ml4_first_odd.png')
-
+plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4__first_odd_test_ml4_first_odd.png')
+plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_first_odd_test_ml4_first_even.png')
+'''
 
 #print(torch.stack([encoder('3',1)]))
 #print(torch.stack([encoder('33',2)]))

@@ -249,9 +249,9 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '../../data/synthetic/pos_int_regression_ml4_even_train.csv'
-    val_file = '../../data/synthetic/pos_int_regression_ml4_even_val.csv'
-    test_file = '../../data/synthetic/pos_int_regression_ml4_even_test.csv'
+    train_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_train.csv'
+    val_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_val.csv'
+    test_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
 
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
