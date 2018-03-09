@@ -17,7 +17,7 @@ from torch.nn.utils.rnn import pad_packed_sequence
 from indice_and_multiplier_subnetwork import *
 import sys
 use_preTrained=False
-use_LSTM=False
+use_LSTM=True
 class SequenceToNumberEncoderCompositional(nn.Module):
     '''
         Takes in a one hot encoded sequence and predicts the number it represents 
@@ -134,9 +134,9 @@ def test(net,test_data_gen,criterion,verbose=False):
         def single_generator():
             for batch_x,batch_y in batched_generator():
                 for i in range(len(batch_x)):
-                    print(batch_x[i],torch.unsqueeze(batch_y[i],0))
+                    print(batch_x[i],[batch_y[i]])
                     
-                    yield ([batch_x[i]],torch.unsqueeze(batch_y[i],0))
+                    yield ([batch_x[i]],[batch_y[i]])
             
         return single_generator
         
@@ -144,7 +144,8 @@ def test(net,test_data_gen,criterion,verbose=False):
         generator = present_single(test_data_gen)
         
     for X,y in generator():
-        X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
+        
+        X,y = stack_and_pack(X,[len(str(int(x))) for x in y],True),Variable(y)
         num_batches += 1
         output = net(X)
         avg_loss = criterion(output, y)
@@ -247,26 +248,27 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_train.csv'
-    val_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_val.csv'
-    test_file = '/Users/arvind/Documents/data/synthetic/pos_int_regression_ml4_test.csv'
+    train_file = '../../data/synthetic/pos_int_regression_ml4_even_train.csv'
+    val_file = '../../data/synthetic/pos_int_regression_ml4_even_val.csv'
+    test_file = '../../data/synthetic/pos_int_regression_ml4_even_test.csv'
+
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
 # #      
     net = SequenceToNumberEncoderCompositional()
     opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 60,encoder),batched_data_generator(val_file,100,100,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 1, 60,encoder),batched_data_generator(val_file,100,100,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
     torch.save(net, 'model_compositional_no_pretrain_4.pkl')
 # #      
 #     
 #     
-#     net = torch.load('model_upper_50_2l.pkl')
-#     print('Original size test loss')
-#     print(test(net,batched_data_generator(test_file,200,1,encoder),criterion,True))
+    net = torch.load('model_compositional_no_pretrain_2_lstm.pkl')
+    print('Original size test loss')
+#     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
 # #     print('New size test loss')
-#     print(test(net,batched_data_generator(test_file_ml4,200,1,encoder),criterion,True))
-#     plot_pred_gold(net, batched_data_generator(test_file_ml2,200,1,encoder), 'train_ml2_test_ml2.png')
-#     plot_pred_gold(net, batched_data_generator(test_file_ml4,200,1,encoder), 'train_ml2_test_ml4.png')
+#     print(test(net,batched_data_generator(val_file,200,2,encoder),criterion,True))
+    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), 'train_ml2_test_ml2.png')
+    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), 'train_ml2_test_ml4.png')
 #     '''
     
     #print(torch.stack([encoder('3',1)]))

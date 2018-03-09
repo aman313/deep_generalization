@@ -159,7 +159,7 @@ def plot_pred_gold(net,data_generator,file_name=None):
     if not file_name:
         file_name = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S') + '.png'
     X,y = next(data_generator())
-    X = stack_and_pack(X, [len(str(int(x))) for x in y.tolist()], True)
+    X = stack_and_pack(X, [len(x) for x in y.tolist()], True)
     pred = net(X)
     plt.scatter(y.tolist(),pred.data.tolist())
     plt.savefig(file_name)
@@ -188,26 +188,26 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_train.csv'
-    val_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_val.csv'
-    test_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_test.csv'
+    train_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_train.csv'
+    val_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_val.csv'
+    test_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_test.csv'
     batched_data_generator = read.batched_data_generator_from_file_with_replacement_for_string_to_seq_of_tuples
     criterion = torch.nn.MSELoss()
 # #      
     net = SequenceToScalarAndMultiplierPredictor()
     opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 100, 60,encoder),batched_data_generator(val_file,100,20,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
-    torch.save(net, 'model_upper_9_235.pkl')
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 2, 60,encoder),batched_data_generator(val_file,2,20,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    torch.save(net, 'model_upper_9_536.pkl')
 # # #      
 #     
 #     
-#     net = torch.load('model_upper_50.pkl')
-#     print('Original size test loss')
-#     print(test(net,batched_data_generator(test_file,200,1,encoder),criterion,True))
-# #     print('New size test loss')
+    net = torch.load('model_upper_9_536.pkl')
+    print('Original size test loss')
+    print(test(net,batched_data_generator(train_file,200,1,encoder),criterion,True))
+#     print('New size test loss')
 #     print(test(net,batched_data_generator(test_file_ml4,200,1,encoder),criterion,True))
-#     plot_pred_gold(net, batched_data_generator(test_file_ml2,200,1,encoder), 'train_ml2_test_ml2.png')
-#     plot_pred_gold(net, batched_data_generator(test_file_ml4,200,1,encoder), 'train_ml2_test_ml4.png')
+    plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), 'train_iml2_test_ml2.png')
+    plot_pred_gold(net, batched_data_generator(train_file,200,1,encoder), 'train_iml2_test_ml4.png')
 #     '''
     
     #print(torch.stack([encoder('3',1)]))
