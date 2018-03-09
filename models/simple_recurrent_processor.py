@@ -138,7 +138,7 @@ def test(net,test_data_gen,criterion,verbose=False):
     return total_loss/num_batches
 
 import gc
-def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
+def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False,model_out):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
@@ -164,6 +164,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
                 break
             if ((best_val_loss[0] -val_losses_list[i][0])/best_val_loss[0]) > tolerance:
                 val_loss_not_improved = 0
+                torch.save(net, model_out)
             else:
                 val_loss_not_improved +=1
         if verbose:
@@ -179,7 +180,7 @@ def train_with_early_stopping(net,train_data_gen,val_data_gen,criterion,optimize
             print('Early stopping at epoch',i)
             break
         gc.collect()
-        
+    net = torch.load(model_out)
     return (train_losses_list,val_losses_list)
 
 def train(net,train_data_gen,test_data_gen,criterion,opt,num_epochs):
@@ -246,7 +247,7 @@ def do_run(run_index,out_prefix):
     #net = torch.load('model.pkl')
     opt = optim.Adam(net.parameters(), lr=1e-3)
     #opt = optim.SGD()
-    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True)
+    train_losses,val_losses =train_with_early_stopping(net,batched_data_generator(train_file, 10, 300,encoder),batched_data_generator(val_file,100,9,encoder),criterion,opt,5000,max_epochs_without_improv=100,verbose=True,out_prefix+str(run_index)+'.pkl')
     torch.save(net, out_prefix+str(run_index)+'.pkl')
 
 
@@ -259,7 +260,7 @@ def do_parallel_runs(num_par,out_prefix):
 
 
 #do_parallel_runs(1,'model_ml4_odd_')
-do_run('','pos_int_regression_ml4_first_odd_1_')
+do_run('','pos_int_regression_ml4_first_odd_')
 
 '''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_even_test.csv'
