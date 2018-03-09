@@ -60,13 +60,15 @@ def strictly_ascending(string,reverse = False):
     print(sorted(str_indices,reverse=reverse) ,str_indices)
     return False
 def generate_sequence_to_current_digit_and_multiplier_dataset(size= 10000,max_len=10):
-    for X in generate_random_positive_integers_of_length(size, max_len):
-        print(X)
-        Y=[]
-        for i in range(0,len(X)):
-            #Y.append([int(X[i:i+1]),10**i])
-            Y.append([float(X[i:i+1])/50])
-        yield (X, Y)
+    def generator():
+        for X in generate_random_positive_integers_of_length(size, max_len):
+            print(X)
+            Y=[]
+            for i in range(0,len(X)):
+                #Y.append([int(X[i:i+1]),10**i])
+                Y.append([float(X[i:i+1])/50])
+            yield (X, Y)
+    return generator
 def generateCurrentDigit(decimal):
         
     return int(decimal[0])
@@ -77,10 +79,10 @@ def generateCurrentDigit(decimal):
 def create_positive_integers_dataset(file_name,size= 10000,max_len=10,train_ratio=0.6,val_ratio=0.2):
     create_dataset(file_name,generate_positive_integers_dataset(size, max_len),train_ratio,val_ratio)
 def create_sequence_to_current_digit_and_multiplier_dataset(file_name,size= 10000,max_len=10,train_ratio=0.8,val_ratio=0.2):
-    create_dataset(file_name,generate_sequence_to_current_digit_and_multiplier_dataset(size, max_len),train_ratio,val_ratio)
+    create_dataset(file_name,generate_sequence_to_current_digit_and_multiplier_dataset(size, max_len),lambda _:True,train_ratio,val_ratio)
             
 
-def create_dataset(file_name,generator_function,filter_function,train_ratio=0.8,val_ratio=0.2):
+def create_dataset(file_name,generator_function,filter_function=lambda _:True,train_ratio=0.8,val_ratio=0.2):
     with open(file_name+'train.csv','w') as out_file_train,open(file_name+'test.csv','w') as out_file_test,open(file_name+'val.csv','w') as out_file_val:
         csv_train= csv.writer(out_file_train)
         csv_test= csv.writer(out_file_test)
@@ -100,6 +102,6 @@ def create_dataset(file_name,generator_function,filter_function,train_ratio=0.8,
                 csv_test.writerow([X,y])
 if __name__=='__main__':
     # create_positive_integers_dataset('/Users/arvind/Documents/data/synthetic/pos_int_regression_ml15_', 1000000, 15)
-    #create_sequence_to_current_digit_and_multiplier_dataset('/Users/arvind/Documents/data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset_', 10000, 5)
+#     create_sequence_to_current_digit_and_multiplier_dataset('../../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_', 10000, 5)
     
     create_dataset(file_name='../../../data/synthetic/pos_int_regression_ml4_first_even_',generator_function=lambda :((str(x),x) for x in range(10000)),filter_function=lambda x:int(x[0])%2==0 )
