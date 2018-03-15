@@ -16,7 +16,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
 from torch.nn.utils.rnn import pad_packed_sequence
 from indice_and_multiplier_subnetwork import *
 import sys
-use_preTrained=False
+use_preTrained=True
 use_LSTM=True
 class SequenceToNumberEncoderCompositional(nn.Module):
     '''
@@ -25,8 +25,9 @@ class SequenceToNumberEncoderCompositional(nn.Module):
     
     def __init__(self):
         super(SequenceToNumberEncoderCompositional, self).__init__()
+        print("Creating network use pretrain",use_preTrained)
 #         self.digitScalarNet=SequenceToScalarAndMultiplierPredictor()
-        if(use_preTrained):
+        if use_preTrained:
             self.preTrainedNets=nn.ModuleList()
             self.digitScalarNet = torch.load('model_upper_50.pkl')
             for param in self.digitScalarNet.parameters():
@@ -168,17 +169,25 @@ class RelativeDifferenceLoss(nn.Module):
         abs_diff = abs_diff_loss(x,y)
         return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
 
-def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
+def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=40,verbose=False):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
     val_losses_list = []
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1,
+                                                           patience=max_epochs_without_improv / 10, verbose=True,
+                                                           threshold=0.0001,
+                                                           threshold_mode='rel', cooldown=0, min_lr=1e-10, eps=1e-08)
+
+
     for i in range(num_epochs):
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         print("Train loss for epoch ",i," was ",train_loss)
         val_loss = test(net, val_data_gen, criterion, False)
         train_losses_list.append(train_loss)
         val_losses_list.append(val_loss)
+        scheduler.step(val_losses_list[i][0])
+
         if i > 0:
             if best_val_loss.data.tolist()[0] ==0.0:
                 break
@@ -241,23 +250,24 @@ def explore_hyperparams(objective_provider,dataset, **fminargs ):
     best_point = fmin(fn=objective_provider(dataset),**fminargs)
     return best_point
 
-if __name__ == '__main__':
+def doRun(modelPrefix,dataPrefix,usePreTrained):
 #     space = {
 #             'first_lstm_layer':hyperopt.hp.choice('first_lstm_layer',[]),
 #             'first_dense_layer_count':hyperopt.hp.choice('first_dense_layer_count',[40,20]),
 #             'second_dense_layer':hyperopt.hp.choice('second_dense_layer',[])
 #         }
-#     
+    global use_preTrained
+    use_preTrained=usePreTrained
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_train.csv'
-    val_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_val.csv'
-    test_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
+    train_file = '../../data/synthetic/pos_int_regression_ml{}_train.csv'.format(dataPrefix)
+    val_file = '../../data/synthetic/pos_int_regression_ml{}_val.csv'.format(dataPrefix)
+    test_file = '../../data/synthetic/pos_int_regression_ml{}_test.csv'.format(dataPrefix)
 
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
 # #
-    date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    model_name='model_compositional_no_pretrain'+date+'.pkl'
+    date=datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    model_name='model_compositional_{}'.format(modelPrefix)+date+'.pkl'
     print("Training:-",model_name)      
     net = SequenceToNumberEncoderCompositional()
     opt = optim.Adam(net.parameters(), lr=1e-2)
@@ -283,5 +293,5 @@ if __name__ == '__main__':
     #print (net(Variable(torch.stack([encoder('333',3)]))))
     #print (net(Variable(torch.stack([encoder('3333',4)]))))
 
-
-        
+if __name__ == '__main__':
+    doRun('4_first_even_no_pretrain_','4_first_even',False)
