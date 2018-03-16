@@ -9,7 +9,7 @@ from hyperopt.fmin import fmin
 from hyperopt import tpe
 from hyperopt.mongoexp import MongoTrials
 from hyperopt.base import Trials, STATUS_OK
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import time
 import datetime
 from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
@@ -169,7 +169,7 @@ class RelativeDifferenceLoss(nn.Module):
         abs_diff = abs_diff_loss(x,y)
         return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
 
-def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=40,verbose=False):
+def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=10,verbose=False):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
@@ -184,8 +184,8 @@ def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterio
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         print("Train loss for epoch ",i," was ",train_loss)
         val_loss = test(net, val_data_gen, criterion, False)
-        train_losses_list.append(train_loss)
-        val_losses_list.append(val_loss)
+        train_losses_list.append(train_loss.data)
+        val_losses_list.append(val_loss.data)
         scheduler.step(val_losses_list[i][0])
 
         if i > 0:
@@ -207,7 +207,7 @@ def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterio
         if val_loss_not_improved >= max_epochs_without_improv:
             print('Early stopping at epoch',i)
             break
-        
+
     return (train_losses_list,val_losses_list)
 
 def train(net,train_data_gen,test_data_gen,criterion,opt,num_epochs):
@@ -268,21 +268,23 @@ def doRun(modelPrefix,dataPrefix,usePreTrained):
 # #
     date=datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     model_name='model_compositional_{}'.format(modelPrefix)+date+'.pkl'
-    print("Training:-",model_name)      
+    # model_name='model_compositional_4_first_even_no_pretrain_2018-03-16 01-04-17.pkl'
+    print("Training:-",model_name)
     net = SequenceToNumberEncoderCompositional()
+    # net = torch.load(model_name)
     opt = optim.Adam(net.parameters(), lr=1e-2)
-    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
-    
+    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 10, 10000,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
+#
 # #      
 #     
-#     model_name='model_compositional_no_pretrain-o.pkl'  
+#     model_name='model_compositional_4_first_even_no_pretrain_2018-03-16 01-04-17.pkl'
     net = torch.load(model_name)
     print('Original size test loss')
 #     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
 # #     print('New size test loss')
 #     print(test(net,batched_data_generator(val_file,200,2,encoder),criterion,True))
-    plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), model_name+'_val.png')
-    plot_pred_gold(net, batched_data_generator(test_file,200,2,encoder), model_name+'_test.png')
+#     plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), model_name+'_val.png')
+#     plot_pred_gold(net, batched_data_generator(test_file,200,2,encoder), model_name+'_test.png')
 #     '''
     
     #print(torch.stack([encoder('3',1)]))
