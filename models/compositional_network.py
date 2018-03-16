@@ -167,7 +167,7 @@ class RelativeDifferenceLoss(nn.Module):
     def forward(self, x,y):
         abs_diff_loss = nn.L1Loss(reduce=False)
         abs_diff = abs_diff_loss(x,y)
-        return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
+        return sum([p/q for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
 
 def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=10,verbose=False):
     val_loss_not_improved=0
