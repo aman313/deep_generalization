@@ -91,7 +91,7 @@ class SequenceToNumberEncoderCompositional(nn.Module):
             
         else:
             raise("Unimplemented for non packed sequences")
-        linear1_out = torch.nn.ReLU()(self.linear1(linear_in))
+        linear1_out = self.linear1(linear_in)
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
 #         print(linear1_out[0])
         return linear1_out
@@ -296,4 +296,4 @@ def doRun(modelPrefix,dataPrefix,usePreTrained):
     #print (net(Variable(torch.stack([encoder('3333',4)]))))
 
 if __name__ == '__main__':
-    doRun('4_first_even_no_pretrain_','4_first_even',False)
+    doRun('6_first_even_no_pretrain_','6_first_even',False)
