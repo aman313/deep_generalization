@@ -186,6 +186,7 @@ def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterio
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         print("Train loss for epoch ",i," was ",train_loss)
         val_loss = test(net, val_data_gen, criterion, False)
+        print("Val loss for epoch ",i," was ",val_loss)
         train_losses_list.append(train_loss.data)
         val_losses_list.append(val_loss.data)
         scheduler.step(val_losses_list[i][0])
@@ -270,9 +271,10 @@ def doRun(modelPrefix,dataPrefix,usePreTrained):
 # #
     date=datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     model_name='model_compositional_{}'.format(modelPrefix)+date+'.pkl'
-    # model_name='model_compositional_4_first_even_no_pretrain_2018-03-16 01-04-17.pkl'
+    
     print("Training:-",model_name)
     net = SequenceToNumberEncoderCompositional()
+#     model_name='model_compositional_6_first_even_no_pretrain_2018-03-16 13-52-43.pkl'
     # net = torch.load(model_name)
     opt = optim.Adam(net.parameters(), lr=1e-2)
     train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 10, 10000,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
