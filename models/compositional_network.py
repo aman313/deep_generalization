@@ -9,7 +9,7 @@ from hyperopt.fmin import fmin
 from hyperopt import tpe
 from hyperopt.mongoexp import MongoTrials
 from hyperopt.base import Trials, STATUS_OK
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import time
 import datetime
 from torch.nn.utils.rnn import pack_padded_sequence, PackedSequence
@@ -177,7 +177,7 @@ def train_with_early_stopping(model_out,net,train_data_gen,val_data_gen,criterio
     train_losses_list = []
     val_losses_list = []
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1,
-                                                           patience=max_epochs_without_improv / 10, verbose=True,
+                                                           patience=max_epochs_without_improv / 5, verbose=True,
                                                            threshold=0.0001,
                                                            threshold_mode='rel', cooldown=0, min_lr=1e-10, eps=1e-08)
 
@@ -227,14 +227,27 @@ def plot_loss(loss,file_name =None):
     plt.plot(loss)
     plt.savefig(file_name)
     plt.close()
-
-def plot_pred_gold(net,data_generator,file_name=None):
+import numpy as np
+def plot_pred_gold(net,data_generator,file_name=None,data_generator2=None):
     if not file_name:
         file_name = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H:%M:%S') + '.png'
     X,y = next(data_generator())
     X = stack_and_pack(X, [len(str(int(x))) for x in y.tolist()], True)
     pred = net(X)
-    plt.scatter(y.tolist(),pred.data.tolist())
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(y.tolist(),pred.data.tolist(),s=.05,c='b')
+    if data_generator2:
+        X, y = next(data_generator2())
+        X = stack_and_pack(X, [len(str(int(x))) for x in y.tolist()], True)
+        pred = net(X)
+        ax1.scatter(y.tolist(), pred.data.tolist(), s=0.05, c='r')
+    # axes = plt.gca()
+    # axes.set_xlim([0, 10000])
+    # axes.set_ylim([0, 10000])
+    # plt.xticks(np.arange(0, 10000 , 1000))
+    # plt.yticks(np.arange(0, 10000, 1000))
+    plt.grid(True)
     plt.savefig(file_name)
     plt.close()
 
@@ -265,19 +278,21 @@ def doRun(modelPrefix,dataPrefix,usePreTrained):
     train_file = '../../data/synthetic/pos_int_regression_ml{}_train.csv'.format(dataPrefix)
     val_file = '../../data/synthetic/pos_int_regression_ml{}_val.csv'.format(dataPrefix)
     test_file = '../../data/synthetic/pos_int_regression_ml{}_test.csv'.format(dataPrefix)
+    test_file= test_file.replace("even","odd")
 
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
 # #
     date=datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     model_name='model_compositional_{}'.format(modelPrefix)+date+'.pkl'
-    
-    print("Training:-",model_name)
+
+
     net = SequenceToNumberEncoderCompositional()
-#     model_name='model_compositional_6_first_even_no_pretrain_2018-03-16 13-52-43.pkl'
+    # model_name='model_compositional_6_first_even_no_pretrain_2018-03-16 14-09-53-epoch 40.pkl'
     # net = torch.load(model_name)
-    opt = optim.Adam(net.parameters(), lr=1e-2)
-    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 10, 10000,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
+    print("Training:-",model_name)
+    opt = optim.Adam(net.parameters(), lr=1e-3)
+    # train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 10, 10000,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
 #
 # #      
 #     
@@ -287,8 +302,8 @@ def doRun(modelPrefix,dataPrefix,usePreTrained):
 #     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
 # #     print('New size test loss')
 #     print(test(net,batched_data_generator(val_file,200,2,encoder),criterion,True))
-#     plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), model_name+'_val.png')
-#     plot_pred_gold(net, batched_data_generator(test_file,200,2,encoder), model_name+'_test.png')
+    plot_pred_gold(net, batched_data_generator(val_file,2000,2,encoder), model_name+'_val.png')
+    plot_pred_gold(net,batched_data_generator(val_file,2000,2,encoder),  model_name+'_test.png',batched_data_generator(test_file,2000,2,encoder))
 #     '''
     
     #print(torch.stack([encoder('3',1)]))

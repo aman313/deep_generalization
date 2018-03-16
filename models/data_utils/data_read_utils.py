@@ -39,6 +39,7 @@ def batched_data_generator_from_file_with_replacement(file_name,batch_size,num_b
     return generate_batches
 def batched_data_generator_from_file_with_replacement_for_string_to_seq_of_tuples(file_name,batch_size,num_batches,transformer):
     data = pd.read_csv(file_name,dtype={'X': np.str, 'y': np.str})
+    print('Read file ', file_name)
     def generate_batches():
         for i in range(num_batches):
             batch_data = data.sample(n = batch_size,replace=True)

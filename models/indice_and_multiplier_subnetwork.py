@@ -108,17 +108,22 @@ def test(net,test_data_gen,criterion,verbose=False):
         total_loss += (avg_loss)
     return total_loss/num_batches
 
-def train_with_early_stopping(model_name,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=20,verbose=False):
+def train_with_early_stopping(model_name,net,train_data_gen,val_data_gen,criterion,optimizer,num_epochs,tolerance=0.001,max_epochs_without_improv=100,verbose=False):
     val_loss_not_improved=0
     best_val_loss = None
     train_losses_list = []
     val_losses_list = []
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1,
+                                                           patience=max_epochs_without_improv/10, verbose=True, threshold=0.0001,
+                                                           threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
     for i in range(num_epochs):
         train_loss = run_epoch(net, train_data_gen, criterion, optimizer)
         print("Train loss for epoch ",i," was ",train_loss)
         val_loss = test(net, val_data_gen, criterion, False)
-        train_losses_list.append(train_loss)
-        val_losses_list.append(val_loss)
+        train_losses_list.append(train_loss.data)
+        val_losses_list.append(val_loss.data)
+        scheduler.step(val_losses_list[i][0])
+
         if i > 0:
             if best_val_loss.data.tolist()[0] ==0.0:
                 break
@@ -189,21 +194,22 @@ if __name__ == '__main__':
 #         }
 #     
     encoder = read.one_hot_transformer(vocab_pos_int)
-    train_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_train.csv'
-    val_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_val.csv'
-    test_file = '../../data/synthetic/digit_and_multiplier_sequence_from_decimal_dataset5_test.csv'
+    train_file = '../synthetic/digit_and_multiplier_sequence_from_decimal_dataset10_train.csv'
+    val_file = '../synthetic/digit_and_multiplier_sequence_from_decimal_dataset10_val.csv'
+    test_file = '../synthetic/digit_and_multiplier_sequence_from_decimal_dataset10_test.csv'
     batched_data_generator = read.batched_data_generator_from_file_with_replacement_for_string_to_seq_of_tuples
     criterion = torch.nn.MSELoss()
 # #
-    date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    model_name='model_indice_'+date+'.pkl'      
+    date=datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    model_name='model_indice_10_'+date+'.pkl'
     net = SequenceToScalarAndMultiplierPredictor()
-    opt = optim.Adam(net.parameters(), lr=1e-3)
-    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 2, 6000,encoder),batched_data_generator(val_file,2,2000,encoder),criterion,opt,10000,max_epochs_without_improv=20,verbose=True)
+    opt = optim.Adam(net.parameters(), lr=1e-2)
+    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 2, 60000,encoder),batched_data_generator(val_file,2,20000,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
     
 # # #      
 #     
-#     
+#
+    # model_name='model_indice_10_best.pkl'
     net = torch.load(model_name)
     print('Original size test loss')
     print(test(net,batched_data_generator(train_file,200,1,encoder),criterion,True))
