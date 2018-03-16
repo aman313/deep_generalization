@@ -47,6 +47,7 @@ class SequenceToNumberEncoderCompositional(nn.Module):
             self.rnn2 = nn.LSTM(20,20,batch_first=True,num_layers=1)
         else:
             self.rnn2 = nn.GRU(20,20,batch_first=True,num_layers=1)
+        self.linear0= nn.Linear(20,20)
         self.linear1 = nn.Linear(20,1)
 
         
@@ -91,6 +92,7 @@ class SequenceToNumberEncoderCompositional(nn.Module):
             
         else:
             raise("Unimplemented for non packed sequences")
+        linear_in=torch.nn.ReLU()(self.linear0(linear_in))
         linear1_out = self.linear1(linear_in)
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
 #         print(linear1_out[0])
