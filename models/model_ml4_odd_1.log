@@ -1,0 +1,1014 @@
+Read file  ../../data/synthetic/pos_int_regression_ml4_odd_train.csv
+Read file  ../../data/synthetic/pos_int_regression_ml4_odd_val.csv
+Epoch 0
+Train loss 0.9986094236373901
+Val loss 0.9957955479621887
+No improvement epochs  0
+Epoch 10
+Train loss 0.990011990070343
+Val loss 0.9892280101776123
+No improvement epochs  4
+Epoch 20
+Train loss 0.9836382865905762
+Val loss 0.9820787906646729
+No improvement epochs  1
+Epoch 30
+Train loss 0.9798951148986816
+Val loss 0.9750112891197205
+No improvement epochs  2
+Epoch 40
+Train loss 0.9703556299209595
+Val loss 0.9732906818389893
+No improvement epochs  3
+Epoch 50
+Train loss 0.9618487358093262
+Val loss 0.9607486724853516
+No improvement epochs  0
+Epoch 60
+Train loss 0.9555963277816772
+Val loss 0.9555684328079224
+No improvement epochs  3
+Epoch 70
+Train loss 0.9453774094581604
+Val loss 0.9480419158935547
+No improvement epochs  4
+Epoch 80
+Train loss 0.9368919134140015
+Val loss 0.9419246315956116
+No improvement epochs  5
+Epoch 90
+Train loss 0.9296340942382812
+Val loss 0.9394354224205017
+No improvement epochs  9
+Epoch 100
+Train loss 0.9192641973495483
+Val loss 0.9175231456756592
+No improvement epochs  3
+Epoch 110
+Train loss 0.910225510597229
+Val loss 0.8955638408660889
+No improvement epochs  0
+Epoch 120
+Train loss 0.9016805291175842
+Val loss 0.9018336534500122
+No improvement epochs  4
+Epoch 130
+Train loss 0.879252016544342
+Val loss 0.8886651396751404
+No improvement epochs  5
+Epoch 140
+Train loss 0.8640738129615784
+Val loss 0.8664113283157349
+No improvement epochs  3
+Epoch 150
+Train loss 0.8568881154060364
+Val loss 0.8511368036270142
+No improvement epochs  1
+Epoch 160
+Train loss 0.8426956534385681
+Val loss 0.8374452590942383
+No improvement epochs  0
+Epoch 170
+Train loss 0.8325226902961731
+Val loss 0.8335081934928894
+No improvement epochs  7
+Epoch 180
+Train loss 0.8174160718917847
+Val loss 0.8212183713912964
+No improvement epochs  5
+Epoch 190
+Train loss 0.800223171710968
+Val loss 0.7871153354644775
+No improvement epochs  0
+Epoch 200
+Train loss 0.7914265990257263
+Val loss 0.7855826020240784
+No improvement epochs  6
+Epoch 210
+Train loss 0.7825332283973694
+Val loss 0.7754327654838562
+No improvement epochs  9
+Epoch 220
+Train loss 0.7769442200660706
+Val loss 0.7656107544898987
+No improvement epochs  7
+Epoch 230
+Train loss 0.7556941509246826
+Val loss 0.7429890036582947
+No improvement epochs  0
+Epoch 240
+Train loss 0.7414038181304932
+Val loss 0.7405973076820374
+No improvement epochs  6
+Epoch 250
+Train loss 0.7335612773895264
+Val loss 0.7415845990180969
+No improvement epochs  4
+Epoch 260
+Train loss 0.7052194476127625
+Val loss 0.7291262149810791
+No improvement epochs  3
+Epoch 270
+Train loss 0.7028286457061768
+Val loss 0.6999155879020691
+No improvement epochs  13
+Epoch 280
+Train loss 0.6901698708534241
+Val loss 0.6851886510848999
+No improvement epochs  0
+Epoch 290
+Train loss 0.6893784999847412
+Val loss 0.6623862981796265
+No improvement epochs  0
+Epoch 300
+Train loss 0.6672267913818359
+Val loss 0.6472449898719788
+No improvement epochs  0
+Epoch 310
+Train loss 0.6592724323272705
+Val loss 0.6485936641693115
+No improvement epochs  2
+Epoch 320
+Train loss 0.6434973478317261
+Val loss 0.6379186511039734
+No improvement epochs  1
+Epoch 330
+Train loss 0.6470319032669067
+Val loss 0.6464223265647888
+No improvement epochs  3
+Epoch 340
+Train loss 0.6229454874992371
+Val loss 0.6358087658882141
+No improvement epochs  13
+Epoch 350
+Train loss 0.6163526773452759
+Val loss 0.6080849170684814
+No improvement epochs  1
+Epoch 360
+Train loss 0.6138761639595032
+Val loss 0.5967102646827698
+No improvement epochs  2
+Epoch 370
+Train loss 0.5917743444442749
+Val loss 0.5873444080352783
+No improvement epochs  6
+Epoch 380
+Train loss 0.5902265310287476
+Val loss 0.588710367679596
+No improvement epochs  16
+Epoch 390
+Train loss 0.5714161396026611
+Val loss 0.5726331472396851
+No improvement epochs  1
+Epoch 400
+Train loss 0.5651510953903198
+Val loss 0.5756672024726868
+No improvement epochs  2
+Epoch 410
+Train loss 0.5604634881019592
+Val loss 0.5632210969924927
+No improvement epochs  8
+Epoch 420
+Train loss 0.5572670102119446
+Val loss 0.5519530177116394
+No improvement epochs  5
+Epoch 430
+Train loss 0.5354740023612976
+Val loss 0.5247279405593872
+No improvement epochs  0
+Epoch 440
+Train loss 0.5464533567428589
+Val loss 0.535712480545044
+No improvement epochs  4
+Epoch 450
+Train loss 0.5214560031890869
+Val loss 0.5040799975395203
+No improvement epochs  0
+Epoch 460
+Train loss 0.507107675075531
+Val loss 0.510623574256897
+No improvement epochs  1
+Epoch 470
+Train loss 0.5046547055244446
+Val loss 0.511396586894989
+No improvement epochs  11
+Epoch 480
+Train loss 0.5058802962303162
+Val loss 0.48894739151000977
+No improvement epochs  7
+Epoch 490
+Train loss 0.48962193727493286
+Val loss 0.4856833815574646
+No improvement epochs  4
+Epoch 500
+Train loss 0.4791456460952759
+Val loss 0.4853118360042572
+No improvement epochs  2
+Epoch 510
+Train loss 0.48571524024009705
+Val loss 0.4739927649497986
+No improvement epochs  8
+Epoch 520
+Train loss 0.46112060546875
+Val loss 0.45643287897109985
+No improvement epochs  1
+Epoch 530
+Train loss 0.45694178342819214
+Val loss 0.4644468128681183
+No improvement epochs  9
+Epoch 540
+Train loss 0.4535001218318939
+Val loss 0.44778645038604736
+No improvement epochs  19
+Epoch 550
+Train loss 0.44208917021751404
+Val loss 0.4464972913265228
+No improvement epochs  1
+Epoch 560
+Train loss 0.43923160433769226
+Val loss 0.4476270079612732
+No improvement epochs  6
+Epoch 570
+Train loss 0.4341164529323578
+Val loss 0.439578652381897
+No improvement epochs  9
+Epoch 580
+Train loss 0.4388856887817383
+Val loss 0.420401930809021
+No improvement epochs  7
+Epoch 590
+Train loss 0.4162549376487732
+Val loss 0.40205422043800354
+No improvement epochs  0
+Epoch 600
+Train loss 0.41923582553863525
+Val loss 0.4050343930721283
+No improvement epochs  10
+Epoch 610
+Train loss 0.4046439528465271
+Val loss 0.39903712272644043
+No improvement epochs  8
+Epoch 620
+Train loss 0.3976610004901886
+Val loss 0.3954349756240845
+No improvement epochs  2
+Epoch 630
+Train loss 0.3963721692562103
+Val loss 0.39895230531692505
+No improvement epochs  6
+Epoch 640
+Train loss 0.3935427963733673
+Val loss 0.3827492892742157
+No improvement epochs  4
+Epoch 650
+Train loss 0.3801274597644806
+Val loss 0.38722822070121765
+No improvement epochs  14
+Epoch 660
+Train loss 0.37524718046188354
+Val loss 0.37335312366485596
+No improvement epochs  1
+Epoch 670
+Train loss 0.3710555136203766
+Val loss 0.3547411561012268
+No improvement epochs  5
+Epoch 680
+Train loss 0.36283034086227417
+Val loss 0.33636748790740967
+No improvement epochs  0
+Epoch 690
+Train loss 0.37099310755729675
+Val loss 0.3480769395828247
+No improvement epochs  10
+Epoch 700
+Train loss 0.35314202308654785
+Val loss 0.35220107436180115
+No improvement epochs  20
+Epoch 710
+Train loss 0.3599100112915039
+Val loss 0.34881097078323364
+No improvement epochs  1
+Epoch 720
+Train loss 0.34514108300209045
+Val loss 0.3482155501842499
+No improvement epochs  11
+Epoch 730
+Train loss 0.33988040685653687
+Val loss 0.33294445276260376
+No improvement epochs  21
+Epoch 740
+Train loss 0.3405532240867615
+Val loss 0.32512804865837097
+No improvement epochs  3
+Epoch 750
+Train loss 0.32242169976234436
+Val loss 0.3217989504337311
+No improvement epochs  13
+Epoch 760
+Train loss 0.3284667432308197
+Val loss 0.3207923471927643
+No improvement epochs  1
+Epoch 770
+Train loss 0.32062238454818726
+Val loss 0.3298541307449341
+No improvement epochs  11
+Epoch 780
+Train loss 0.3311905562877655
+Val loss 0.30255255103111267
+No improvement epochs  1
+Epoch 790
+Train loss 0.31492987275123596
+Val loss 0.30276724696159363
+No improvement epochs  4
+Epoch 800
+Train loss 0.3034467399120331
+Val loss 0.30683648586273193
+No improvement epochs  1
+Epoch 810
+Train loss 0.30620306730270386
+Val loss 0.303730845451355
+No improvement epochs  11
+Epoch 820
+Train loss 0.29356539249420166
+Val loss 0.29025721549987793
+No improvement epochs  21
+Epoch 830
+Train loss 0.2971576452255249
+Val loss 0.2867347300052643
+No improvement epochs  8
+Epoch 840
+Train loss 0.323817640542984
+Val loss 0.2940063178539276
+No improvement epochs  4
+Epoch 850
+Train loss 0.288831889629364
+Val loss 0.27505722641944885
+No improvement epochs  7
+Epoch 860
+Train loss 0.2842908799648285
+Val loss 0.26794442534446716
+No improvement epochs  17
+Epoch 870
+Train loss 0.27405714988708496
+Val loss 0.2602587342262268
+No improvement epochs  1
+Epoch 880
+Train loss 0.27124840021133423
+Val loss 0.27001428604125977
+No improvement epochs  11
+Epoch 890
+Train loss 0.27163684368133545
+Val loss 0.25665193796157837
+No improvement epochs  21
+Epoch 900
+Train loss 0.27252769470214844
+Val loss 0.24663837254047394
+No improvement epochs  0
+Epoch 910
+Train loss 0.2572038173675537
+Val loss 0.25350522994995117
+No improvement epochs  3
+Epoch 920
+Train loss 0.252009779214859
+Val loss 0.24491442739963531
+No improvement epochs  13
+Epoch 930
+Train loss 0.24813155829906464
+Val loss 0.22985151410102844
+No improvement epochs  9
+Epoch 940
+Train loss 0.2534661293029785
+Val loss 0.24252040684223175
+No improvement epochs  19
+Epoch 950
+Train loss 0.23542363941669464
+Val loss 0.24276535212993622
+No improvement epochs  29
+Epoch 960
+Train loss 0.2403711974620819
+Val loss 0.22662939131259918
+No improvement epochs  39
+Epoch 970
+Train loss 0.23292192816734314
+Val loss 0.22931647300720215
+No improvement epochs  1
+Epoch 980
+Train loss 0.22655364871025085
+Val loss 0.21575751900672913
+No improvement epochs  5
+Epoch 990
+Train loss 0.22245460748672485
+Val loss 0.21976856887340546
+No improvement epochs  4
+Epoch 1000
+Train loss 0.21345792710781097
+Val loss 0.207286536693573
+No improvement epochs  6
+Epoch 1010
+Train loss 0.21560712158679962
+Val loss 0.21537210047245026
+No improvement epochs  5
+Epoch 1020
+Train loss 0.2150721698999405
+Val loss 0.21174585819244385
+No improvement epochs  15
+Epoch 1030
+Train loss 0.21336716413497925
+Val loss 0.208808034658432
+No improvement epochs  25
+Epoch 1040
+Train loss 0.20547369122505188
+Val loss 0.20672142505645752
+No improvement epochs  1
+Epoch 1050
+Train loss 0.20523937046527863
+Val loss 0.20872041583061218
+No improvement epochs  11
+Epoch 1060
+Train loss 0.21202804148197174
+Val loss 0.1848718374967575
+No improvement epochs  0
+Epoch 1070
+Train loss 0.20188258588314056
+Val loss 0.20361202955245972
+No improvement epochs  4
+Epoch 1080
+Train loss 0.1955534815788269
+Val loss 0.17724710702896118
+No improvement epochs  3
+Epoch 1090
+Train loss 0.18988125026226044
+Val loss 0.18055635690689087
+No improvement epochs  13
+Epoch 1100
+Train loss 0.19112232327461243
+Val loss 0.17420780658721924
+No improvement epochs  23
+Epoch 1110
+Train loss 0.19330547749996185
+Val loss 0.17272453010082245
+No improvement epochs  33
+Epoch 1120
+Train loss 0.185847207903862
+Val loss 0.17258062958717346
+No improvement epochs  6
+Epoch 1130
+Train loss 0.18486998975276947
+Val loss 0.1658482402563095
+No improvement epochs  0
+Epoch 1140
+Train loss 0.1739884614944458
+Val loss 0.16512630879878998
+No improvement epochs  2
+Epoch 1150
+Train loss 0.17449255287647247
+Val loss 0.16900111734867096
+No improvement epochs  4
+Epoch 1160
+Train loss 0.17153224349021912
+Val loss 0.16528011858463287
+No improvement epochs  14
+Epoch 1170
+Train loss 0.16659541428089142
+Val loss 0.16813614964485168
+No improvement epochs  1
+Epoch 1180
+Train loss 0.1687241643667221
+Val loss 0.1666024923324585
+No improvement epochs  11
+Epoch 1190
+Train loss 0.16080155968666077
+Val loss 0.1610264629125595
+No improvement epochs  3
+Epoch 1200
+Train loss 0.15509699285030365
+Val loss 0.1628125011920929
+No improvement epochs  13
+Epoch 1210
+Train loss 0.15409265458583832
+Val loss 0.15594683587551117
+No improvement epochs  23
+Epoch 1220
+Train loss 0.15318897366523743
+Val loss 0.15859776735305786
+No improvement epochs  4
+Epoch 1230
+Train loss 0.15138007700443268
+Val loss 0.15424372255802155
+No improvement epochs  14
+Epoch 1240
+Train loss 0.14922840893268585
+Val loss 0.1438811868429184
+No improvement epochs  8
+Epoch 1250
+Train loss 0.14067912101745605
+Val loss 0.13919958472251892
+No improvement epochs  18
+Epoch 1260
+Train loss 0.14380693435668945
+Val loss 0.1388612985610962
+No improvement epochs  7
+Epoch 1270
+Train loss 0.1405930072069168
+Val loss 0.1342988908290863
+No improvement epochs  17
+Epoch 1280
+Train loss 0.13578972220420837
+Val loss 0.13456875085830688
+No improvement epochs  6
+Epoch 1290
+Train loss 0.13398942351341248
+Val loss 0.13880614936351776
+No improvement epochs  1
+Epoch 1300
+Train loss 0.12818048894405365
+Val loss 0.1239725723862648
+No improvement epochs  0
+Epoch 1310
+Train loss 0.1325858235359192
+Val loss 0.12637509405612946
+No improvement epochs  7
+Epoch 1320
+Train loss 0.13023285567760468
+Val loss 0.13083651661872864
+No improvement epochs  17
+Epoch 1330
+Train loss 0.1262313425540924
+Val loss 0.13278542459011078
+No improvement epochs  1
+Epoch 1340
+Train loss 0.12309025973081589
+Val loss 0.12131769210100174
+No improvement epochs  11
+Epoch 1350
+Train loss 0.12306784093379974
+Val loss 0.1085209995508194
+No improvement epochs  4
+Epoch 1360
+Train loss 0.12189365178346634
+Val loss 0.1132042407989502
+No improvement epochs  14
+Epoch 1370
+Train loss 0.1194150522351265
+Val loss 0.11787198483943939
+No improvement epochs  24
+Epoch 1380
+Train loss 0.11669222265481949
+Val loss 0.11293300986289978
+No improvement epochs  6
+Epoch 1390
+Train loss 0.10927275568246841
+Val loss 0.1157374233007431
+No improvement epochs  16
+Epoch 1400
+Train loss 0.11043847352266312
+Val loss 0.10944980382919312
+No improvement epochs  2
+Epoch 1410
+Train loss 0.11393741518259048
+Val loss 0.09934493899345398
+No improvement epochs  6
+Epoch 1420
+Train loss 0.14780014753341675
+Val loss 0.1047205850481987
+No improvement epochs  16
+Epoch 1430
+Train loss 0.10477153956890106
+Val loss 0.1086069643497467
+No improvement epochs  26
+Epoch 1440
+Train loss 0.12224891781806946
+Val loss 0.11042025685310364
+No improvement epochs  1
+Epoch 1450
+Train loss 0.10371935367584229
+Val loss 0.10602021962404251
+No improvement epochs  3
+Epoch 1460
+Train loss 0.09821603447198868
+Val loss 0.09787896275520325
+No improvement epochs  13
+Epoch 1470
+Train loss 0.09942343086004257
+Val loss 0.0985647588968277
+No improvement epochs  23
+Epoch 1480
+Train loss 0.09549228847026825
+Val loss 0.09343478083610535
+No improvement epochs  33
+Epoch 1490
+Train loss 0.09608686715364456
+Val loss 0.08931198716163635
+No improvement epochs  4
+Epoch 1500
+Train loss 0.09753072261810303
+Val loss 0.08462923765182495
+No improvement epochs  0
+Epoch 1510
+Train loss 0.09377977252006531
+Val loss 0.08849741518497467
+No improvement epochs  6
+Epoch 1520
+Train loss 0.08881901949644089
+Val loss 0.08619732409715652
+No improvement epochs  16
+Epoch 1530
+Train loss 0.0918925479054451
+Val loss 0.08793395012617111
+No improvement epochs  6
+Epoch 1540
+Train loss 0.08642358332872391
+Val loss 0.07979554682970047
+No improvement epochs  0
+Epoch 1550
+Train loss 0.0870555192232132
+Val loss 0.0836920514702797
+No improvement epochs  10
+Epoch 1560
+Train loss 0.08690930902957916
+Val loss 0.08278769999742508
+No improvement epochs  5
+Epoch 1570
+Train loss 0.08427541702985764
+Val loss 0.08478492498397827
+No improvement epochs  3
+Epoch 1580
+Train loss 0.07901766896247864
+Val loss 0.08357575535774231
+No improvement epochs  13
+Epoch 1590
+Train loss 0.08031647652387619
+Val loss 0.07797765731811523
+No improvement epochs  23
+Epoch 1600
+Train loss 0.08146893233060837
+Val loss 0.07275137305259705
+No improvement epochs  33
+Epoch 1610
+Train loss 0.07860816270112991
+Val loss 0.08191002905368805
+No improvement epochs  4
+Epoch 1620
+Train loss 0.07620976120233536
+Val loss 0.07916634529829025
+No improvement epochs  14
+Epoch 1630
+Train loss 0.07543634623289108
+Val loss 0.07680389285087585
+No improvement epochs  9
+Epoch 1640
+Train loss 0.0728716179728508
+Val loss 0.07271511107683182
+No improvement epochs  19
+Epoch 1650
+Train loss 0.07335823029279709
+Val loss 0.07687432318925858
+No improvement epochs  29
+Epoch 1660
+Train loss 0.07001113146543503
+Val loss 0.06830932199954987
+No improvement epochs  2
+Epoch 1670
+Train loss 0.07094576209783554
+Val loss 0.07572547346353531
+No improvement epochs  3
+Epoch 1680
+Train loss 0.07198558002710342
+Val loss 0.07202170044183731
+No improvement epochs  3
+Epoch 1690
+Train loss 0.0665857344865799
+Val loss 0.06532277911901474
+No improvement epochs  7
+Epoch 1700
+Train loss 0.06535124778747559
+Val loss 0.05852339789271355
+No improvement epochs  0
+Epoch 1710
+Train loss 0.06475402414798737
+Val loss 0.06347014009952545
+No improvement epochs  10
+Epoch 1720
+Train loss 0.0632031187415123
+Val loss 0.06904202699661255
+No improvement epochs  20
+Epoch 1730
+Train loss 0.0647834837436676
+Val loss 0.0624854639172554
+No improvement epochs  8
+Epoch 1740
+Train loss 0.05997680500149727
+Val loss 0.05714370682835579
+No improvement epochs  18
+Epoch 1750
+Train loss 0.060608088970184326
+Val loss 0.05164961516857147
+No improvement epochs  0
+Epoch 1760
+Train loss 0.058775175362825394
+Val loss 0.054664552211761475
+No improvement epochs  5
+Epoch 1770
+Train loss 0.058514632284641266
+Val loss 0.05418102443218231
+No improvement epochs  15
+Epoch 1780
+Train loss 0.060409482568502426
+Val loss 0.05930864065885544
+No improvement epochs  1
+Epoch 1790
+Train loss 0.05628689378499985
+Val loss 0.05061709135770798
+No improvement epochs  11
+Epoch 1800
+Train loss 0.05765886977314949
+Val loss 0.055256620049476624
+No improvement epochs  2
+Epoch 1810
+Train loss 0.05269011855125427
+Val loss 0.05126519501209259
+No improvement epochs  4
+Epoch 1820
+Train loss 0.05839390307664871
+Val loss 0.04987417533993721
+No improvement epochs  6
+Epoch 1830
+Train loss 0.059065550565719604
+Val loss 0.05102017894387245
+No improvement epochs  8
+Epoch 1840
+Train loss 0.054905422031879425
+Val loss 0.05306791886687279
+No improvement epochs  7
+Epoch 1850
+Train loss 0.05100394785404205
+Val loss 0.046873077750205994
+No improvement epochs  17
+Epoch 1860
+Train loss 0.053346965461969376
+Val loss 0.04433055222034454
+No improvement epochs  3
+Epoch 1870
+Train loss 0.04978753253817558
+Val loss 0.05117930844426155
+No improvement epochs  6
+Epoch 1880
+Train loss 0.049710292369127274
+Val loss 0.044333793222904205
+No improvement epochs  3
+Epoch 1890
+Train loss 0.046690646559000015
+Val loss 0.04353713616728783
+No improvement epochs  7
+Epoch 1900
+Train loss 0.04815587401390076
+Val loss 0.04882075637578964
+No improvement epochs  17
+Epoch 1910
+Train loss 0.04736663028597832
+Val loss 0.04580724984407425
+No improvement epochs  1
+Epoch 1920
+Train loss 0.04734564200043678
+Val loss 0.03848481550812721
+No improvement epochs  0
+Epoch 1930
+Train loss 0.046115219593048096
+Val loss 0.036671772599220276
+No improvement epochs  0
+Epoch 1940
+Train loss 0.046350762248039246
+Val loss 0.04420093074440956
+No improvement epochs  10
+Epoch 1950
+Train loss 0.04225006327033043
+Val loss 0.0394202284514904
+No improvement epochs  20
+Epoch 1960
+Train loss 0.04313167557120323
+Val loss 0.040256697684526443
+No improvement epochs  7
+Epoch 1970
+Train loss 0.04088020697236061
+Val loss 0.03987503796815872
+No improvement epochs  17
+Epoch 1980
+Train loss 0.04055693745613098
+Val loss 0.03965380787849426
+No improvement epochs  27
+Epoch 1990
+Train loss 0.04006645828485489
+Val loss 0.03715448081493378
+No improvement epochs  37
+Epoch 2000
+Train loss 0.03776462748646736
+Val loss 0.03655495494604111
+No improvement epochs  2
+Epoch 2010
+Train loss 0.03841383382678032
+Val loss 0.03702623397111893
+No improvement epochs  12
+Epoch 2020
+Train loss 0.03654153645038605
+Val loss 0.03200418874621391
+No improvement epochs  1
+Epoch 2030
+Train loss 0.03642495349049568
+Val loss 0.039093200117349625
+No improvement epochs  11
+Epoch 2040
+Train loss 0.03575480729341507
+Val loss 0.034311555325984955
+No improvement epochs  21
+Epoch 2050
+Train loss 0.03335040807723999
+Val loss 0.041476406157016754
+No improvement epochs  31
+Epoch 2060
+Train loss 0.03457724675536156
+Val loss 0.03331048786640167
+No improvement epochs  4
+Epoch 2070
+Train loss 0.033781711012125015
+Val loss 0.033410701900720596
+No improvement epochs  14
+Epoch 2080
+Train loss 0.0317983515560627
+Val loss 0.033641085028648376
+No improvement epochs  8
+Epoch 2090
+Train loss 0.03295309841632843
+Val loss 0.027360128238797188
+No improvement epochs  5
+Epoch 2100
+Train loss 0.03209130838513374
+Val loss 0.03122815117239952
+No improvement epochs  15
+Epoch 2110
+Train loss 0.031048355624079704
+Val loss 0.026304151862859726
+No improvement epochs  25
+Epoch 2120
+Train loss 0.03069731965661049
+Val loss 0.03153251111507416
+No improvement epochs  35
+Epoch 2130
+Train loss 0.031282782554626465
+Val loss 0.02607451193034649
+No improvement epochs  1
+Epoch 2140
+Train loss 0.0304724033921957
+Val loss 0.02777535654604435
+No improvement epochs  11
+Epoch 2150
+Train loss 0.029743283987045288
+Val loss 0.026819925755262375
+No improvement epochs  21
+Epoch 2160
+Train loss 0.029363807290792465
+Val loss 0.025676744058728218
+No improvement epochs  31
+Epoch 2170
+Train loss 0.028767665848135948
+Val loss 0.030760543420910835
+No improvement epochs  7
+Epoch 2180
+Train loss 0.1856636106967926
+Val loss 0.025883885100483894
+No improvement epochs  1
+Epoch 2190
+Train loss 0.026209596544504166
+Val loss 0.021689267829060555
+No improvement epochs  2
+Epoch 2200
+Train loss 0.02994370460510254
+Val loss 0.026021907106041908
+No improvement epochs  12
+Epoch 2210
+Train loss 0.027381181716918945
+Val loss 0.026756353676319122
+No improvement epochs  1
+Epoch 2220
+Train loss 0.02650771476328373
+Val loss 0.027896706014871597
+No improvement epochs  11
+Epoch 2230
+Train loss 0.026011645793914795
+Val loss 0.024251794442534447
+No improvement epochs  21
+Epoch 2240
+Train loss 0.026050182059407234
+Val loss 0.028042243793606758
+No improvement epochs  7
+Epoch 2250
+Train loss 0.024570193141698837
+Val loss 0.01974450796842575
+No improvement epochs  0
+Epoch 2260
+Train loss 0.024393735453486443
+Val loss 0.022115202620625496
+No improvement epochs  8
+Epoch 2270
+Train loss 0.023843836039304733
+Val loss 0.01872553676366806
+No improvement epochs  18
+Epoch 2280
+Train loss 0.021283026784658432
+Val loss 0.0200436320155859
+No improvement epochs  28
+Epoch 2290
+Train loss 0.023822002112865448
+Val loss 0.022081024944782257
+No improvement epochs  38
+Epoch 2300
+Train loss 0.023614682257175446
+Val loss 0.022262979298830032
+No improvement epochs  48
+Epoch  2303: reducing learning rate of group 0 to 1.0000e-04.
+Epoch 2310
+Train loss 0.02093578316271305
+Val loss 0.017316898331046104
+No improvement epochs  2
+Epoch 2320
+Train loss 0.020581142976880074
+Val loss 0.018405741080641747
+No improvement epochs  12
+Epoch 2330
+Train loss 0.01986534334719181
+Val loss 0.017364677041769028
+No improvement epochs  22
+Epoch 2340
+Train loss 0.022514507174491882
+Val loss 0.018627069890499115
+No improvement epochs  32
+Epoch 2350
+Train loss 0.020633378997445107
+Val loss 0.01912481151521206
+No improvement epochs  42
+Epoch  2359: reducing learning rate of group 0 to 1.0000e-05.
+Epoch 2360
+Train loss 0.020846975967288017
+Val loss 0.02079794742166996
+No improvement epochs  52
+Epoch 2370
+Train loss 0.01982341893017292
+Val loss 0.018226029351353645
+No improvement epochs  62
+Epoch 2380
+Train loss 0.019305450841784477
+Val loss 0.016611525788903236
+No improvement epochs  9
+Epoch 2390
+Train loss 0.019021954387426376
+Val loss 0.01935175061225891
+No improvement epochs  19
+Epoch 2400
+Train loss 0.02026265487074852
+Val loss 0.01674589328467846
+No improvement epochs  29
+Epoch 2410
+Train loss 0.020796161144971848
+Val loss 0.01880650967359543
+No improvement epochs  39
+Epoch 2420
+Train loss 0.019390223547816277
+Val loss 0.017957251518964767
+No improvement epochs  4
+Epoch 2430
+Train loss 0.01788516528904438
+Val loss 0.01760883815586567
+No improvement epochs  14
+Epoch 2440
+Train loss 0.017636582255363464
+Val loss 0.018393374979496002
+No improvement epochs  24
+Epoch 2450
+Train loss 0.018308700993657112
+Val loss 0.01664006896317005
+No improvement epochs  34
+Epoch 2460
+Train loss 0.021253719925880432
+Val loss 0.019836345687508583
+No improvement epochs  44
+Epoch  2467: reducing learning rate of group 0 to 1.0000e-06.
+Epoch 2470
+Train loss 0.01935221068561077
+Val loss 0.017881955951452255
+No improvement epochs  54
+Epoch 2480
+Train loss 0.01939491182565689
+Val loss 0.016139399260282516
+No improvement epochs  64
+Epoch 2490
+Train loss 0.019646577537059784
+Val loss 0.015494831837713718
+No improvement epochs  74
+Epoch 2500
+Train loss 0.019384227693080902
+Val loss 0.018248921260237694
+No improvement epochs  84
+Epoch 2510
+Train loss 0.020703231915831566
+Val loss 0.01761571876704693
+No improvement epochs  94
+Early stopping at epoch 2516

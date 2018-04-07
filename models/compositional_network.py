@@ -251,26 +251,17 @@ if __name__ == '__main__':
     encoder = read.one_hot_transformer(vocab_pos_int)
     train_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_train.csv'
     val_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_val.csv'
-    test_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
+    test_file = '../../data/synthetic/pos_int_regression_ml4_first_even_test.csv'
 
     batched_data_generator = read.batched_data_generator_from_file_with_replacement
     criterion = RelativeDifferenceLoss()
-# #
-    date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    model_name='model_compositional_no_pretrain'+date+'.pkl'
-    print("Training:-",model_name)      
-    net = SequenceToNumberEncoderCompositional()
-    opt = optim.Adam(net.parameters(), lr=1e-2)
-    train_losses,val_losses =train_with_early_stopping(model_name,net,batched_data_generator(train_file, 100, 100,encoder),batched_data_generator(val_file,100,30,encoder),criterion,opt,10000,max_epochs_without_improv=50,verbose=True)
-    
-# #      
-#     
-#     model_name='model_compositional_no_pretrain-o.pkl'  
+     
+    model_name='model_compositional_no_pretrain.pkl'  
     net = torch.load(model_name)
     print('Original size test loss')
 #     print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,True))
 # #     print('New size test loss')
-#     print(test(net,batched_data_generator(val_file,200,2,encoder),criterion,True))
+    print(test(net,batched_data_generator(test_file,200,2,encoder),criterion,False))
     plot_pred_gold(net, batched_data_generator(val_file,200,2,encoder), model_name+'_val.png')
     plot_pred_gold(net, batched_data_generator(test_file,200,2,encoder), model_name+'_test.png')
 #     '''

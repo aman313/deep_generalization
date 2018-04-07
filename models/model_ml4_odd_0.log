@@ -1,0 +1,10 @@
+Read file  ../../data/synthetic/pos_int_regression_ml4_odd_train.csv
+Read file  ../../data/synthetic/pos_int_regression_ml4_odd_val.csv
+Epoch 0
+Train loss 0.9995164275169373
+Val loss 0.9987121224403381
+No improvement epochs  0
+Epoch 10
+Train loss 0.9931243062019348
+Val loss 0.9923760890960693
+No improvement epochs  5

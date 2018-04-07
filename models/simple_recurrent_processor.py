@@ -27,7 +27,8 @@ class SequenceToNumberEncoder(nn.Module):
     def __init__(self):
         super(SequenceToNumberEncoder, self).__init__()
         self.num_layers = 4
-        self.lstm = nn.LSTM(10,20,batch_first=True,num_layers=self.num_layers)
+        self.embedding = nn.Embedding(10, 1)
+        self.lstm = nn.LSTM(1,20,batch_first=True,num_layers=self.num_layers)
         self.linear1 = nn.Linear(20,1)
             
     def get_stacked_last_slices(self,unpacked,seq_lens):
@@ -39,6 +40,12 @@ class SequenceToNumberEncoder(nn.Module):
     def forward(self, input):
         if isinstance(input,tuple):
             input = PackedSequence(input[0],input[1])
+            
+        if isinstance(input, list):
+            seq_lens = [len(x.tolist()) for x in input]
+            input = [self.embedding(x) for x in input]
+            input = stack_and_pack(input, seq_lens, True, True)
+            
         if isinstance(input,PackedSequence):
             if GPU:
                 lstm_out,_ = self.lstm(input,(Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False),Variable(torch.randn(self.num_layers,input.batch_sizes[0],20).cuda(),requires_grad=False) ) )
@@ -50,7 +57,7 @@ class SequenceToNumberEncoder(nn.Module):
         else:
             lstm_out,_ = self.lstm(input,(Variable(torch.randn(2,input.size(0),20).cuda(),requires_grad=False),Variable(torch.randn(2,input.size(0),20).cuda(),requires_grad=False) ) )
             linear_in = lstm_out[:,-1,:]
-        linear1_out = torch.nn.ReLU()(self.linear1(linear_in))
+        linear1_out = self.linear1(linear_in)
         #linear2_out = torch.nn.ReLU()(self.linear2(linear1_out))
         del input
         return linear1_out
@@ -63,9 +70,18 @@ class RelativeDifferenceLoss(nn.Module):
     def forward(self, x,y):
         abs_diff_loss = nn.L1Loss(reduce=False)
         abs_diff = abs_diff_loss(x,y)
-        return sum([p/q if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())])/len(y.data.tolist())
-
-def stack_and_pack(lst,seq_lens,pack=False):
+        rel_diff = [(p/q) if not q==0 else p for p,q in zip(abs_diff,y.data.tolist())]
+        mean = sum(rel_diff)/len(y.data.tolist())
+        var = sum([torch.abs(x-mean) for x in rel_diff ])/(len(y.data.tolist()))
+        #loss_tensor = torch.stack([x.data for x in rel_diff])
+        #print('Loss variance and mean',torch.var(loss_tensor), torch.mean(loss_tensor))
+        #return Variable(torch.FloatTensor([torch.mean( loss_tensor) ]) ,requires_grad=True)#+ torch.var(loss_tensor)
+        #mean = Variable(torch.FloatTensor([torch.mean( loss_tensor) ]),requires_grad=True)
+        return mean 
+        
+def stack_and_pack(lst,seq_lens,pack=False,stack=True):
+    if not stack:
+        return lst
     if not pack:
         if GPU:
             return Variable(torch.stack(lst)).cuda()
@@ -88,9 +104,9 @@ def run_epoch(net,train_data_gen,criterion,opt):
     for (X,y) in train_data_gen():
         #print('generated batch')
         if GPU:
-            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y.cuda())
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False,False),Variable(y.cuda())
         else:
-            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],True),Variable(y)
+            X,y = stack_and_pack(X,[len(str(int(x))) for x in y.tolist()],False,False),Variable(y)
 
         opt.zero_grad()
         #print(type(X))
@@ -230,7 +246,8 @@ space = {
         'second_dense_layer':hyperopt.hp.choice('second_dense_layer',[])
     }
 
-encoder = read.one_hot_transformer(vocab_pos_int)
+#encoder = read.one_hot_transformer(vocab_pos_int)
+encoder = lambda x,_:torch.LongTensor([int(a) for a in x])
 train_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_train.csv'
 val_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_val.csv'
 test_file = '../../data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
@@ -260,18 +277,18 @@ def do_parallel_runs(num_par,out_prefix):
 
 
 #do_parallel_runs(1,'model_ml4_odd_')
-do_run('','pos_int_regression_ml4_first_odd_1_')
-'''
+do_run('','pos_int_regression_ml4_first_odd_embed')
 
+'''
 test_file_ml2 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_odd_test.csv'
 test_file_ml4 = '/Users/aman313/Documents/data/synthetic/pos_int_regression_ml4_first_even_test.csv'
-net = torch.load('pos_int_regression_ml4_first_odd_.pkl')
+net = torch.load('pos_int_regression_ml4_first_odd_1_stddev.pkl')
 print('Original size test loss')
-print(test(net,batched_data_generator(test_file_ml2,800,1,encoder),criterion,False))
+print(test(net,batched_data_generator(test_file_ml2,800,1,encoder),criterion,True))
 print('New size test loss')
-print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,False))
-plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4__first_odd_test_ml4_first_odd.png')
-plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_first_odd_test_ml4_first_even.png')
+print(test(net,batched_data_generator(test_file_ml4,800,1,encoder),criterion,True))
+plot_pred_gold(net, batched_data_generator(test_file_ml2,800,1,encoder), 'train_ml4__first_odd_test_ml4_first_odd_1_stddev.png')
+plot_pred_gold(net, batched_data_generator(test_file_ml4,800,1,encoder), 'train_ml4_first_odd_test_ml4_first_even_1_stdev.png')
 '''
 
 #print(torch.stack([encoder('3',1)]))
